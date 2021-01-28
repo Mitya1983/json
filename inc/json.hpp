@@ -32,6 +32,8 @@ public:
 
     void addObject(JsonObject &&object);
 
+    std::shared_ptr<JsonObject> getChildByName(std::string_view name) const;
+
     ///Returns const reference to std::shared_ptr<JsonObject> or throws std::runtime_error otherwise.
     const std::vector<std::shared_ptr<JsonObject>> &toArray() const;
     ///Returns const reference to std::string std::bad_variant_access otherwise.

@@ -55,6 +55,21 @@ void json::JsonObject::addObject(json::JsonObject &&object)
     m_childs.emplace_back(std::make_shared<json::JsonObject>(std::move(object)));
 }
 
+std::shared_ptr<json::JsonObject> json::JsonObject::getChildByName(std::string_view name) const
+{
+    if (!this->isObject()){
+        throw std::runtime_error("const json::JsonObject &json::JsonObject::getChildByName(std::string_view name): [this] is not an Object");
+    }
+    size_t count = 0;
+    for (const auto &child : m_childs){
+        if (child->m_key == name){
+            return child;
+        }
+        ++count;
+    }
+    return std::shared_ptr<json::JsonObject>();
+}
+
 const std::vector<std::shared_ptr<json::JsonObject>> &json::JsonObject::toArray() const
 {
     if (!m_array){
@@ -219,8 +234,8 @@ std::string json::JsonObject::_toStream() const
             if (!m_root){
                 returnValue += "\"" + m_key + "\":";
             }
-            returnValue += '{';
         }
+        returnValue += '{';
         for (const auto &JsonObject : m_childs){
             returnValue += JsonObject->_toStream();
             if (++objectNumber <= objectCount){
@@ -443,7 +458,7 @@ std::string json::JsonObject::_getValue(std::string_view jsonData)
             }
             else{
                 valueStartPos = data.find_first_not_of(' ', separatorPos);
-                valueEndPos = data.find_last_not_of(" \n\t") + 1;
+                valueEndPos = data.find_last_not_of(" \r\n\t") + 1;
             }
         }
     }
@@ -511,8 +526,9 @@ std::vector<std::string> parseArray(std::string_view jsonData){
     std::string data(jsonData);
     std::vector<std::string> childs;
     size_t childStart = 1;
+    bool breakOnAdd = false;
     while (true) {
-        childStart = data.find_first_not_of(" \n\t", childStart);
+        childStart = data.find_first_not_of(" \r\n\t", childStart);
         if (childStart == data.size() - 1){
             break;
         }
@@ -521,17 +537,21 @@ std::vector<std::string> parseArray(std::string_view jsonData){
             childEnd = data.find("},", childStart);
             if (childEnd == std::string::npos){
                 childEnd = data.find_last_of('}');
+                breakOnAdd = true;
             }
             ++childEnd;
         }
         else{
             childEnd = data.find(',', childStart);
             if (childEnd == std::string::npos){
-                childEnd = data.find_last_not_of(" \n\t", data.size() - 2);
+                childEnd = data.find_last_not_of(" \r\n\t", data.size() - 2);
                 ++childEnd;
             }
         }
         childs.emplace_back(data.substr(childStart, childEnd - childStart));
+        if (breakOnAdd){
+            break;
+        }
         childStart = childEnd + 1;
     }
     return childs;
