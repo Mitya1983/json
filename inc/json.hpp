@@ -36,9 +36,9 @@ public:
 
     ///Returns const reference to std::shared_ptr<JsonObject> or throws std::runtime_error otherwise.
     const std::vector<std::shared_ptr<JsonObject>> &toArray() const;
-    ///Returns const reference to std::string std::bad_variant_access otherwise.
+    ///Returns const std::string, which is empty if value in json was [null] and std::bad_variant_access if value is not string.
     ///This function returns only JsonObject:Value as a string and should not be used for file or stream generation. Use operator<<() instead.
-    const std::string &toString() const;
+    std::string toString() const;
     ///Returns const double or throws std::bad_variant_access otherwise.
     double toDouble() const;
     ///Returns const int or throws std::bad_variant_access otherwise.

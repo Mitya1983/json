@@ -78,8 +78,11 @@ const std::vector<std::shared_ptr<json::JsonObject>> &json::JsonObject::toArray(
     return m_childs;
 }
 
-const std::string &json::JsonObject::toString() const
+std::string json::JsonObject::toString() const
 {
+    if(std::holds_alternative<std::monostate>(m_value)){
+        return "";
+    }
     return std::get<std::string>(m_value);
 }
 
