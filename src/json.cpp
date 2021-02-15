@@ -55,6 +55,16 @@ void json::JsonObject::addObject(json::JsonObject &&object)
     m_childs.emplace_back(std::make_shared<json::JsonObject>(std::move(object)));
 }
 
+void json::JsonObject::setValue(std::variant<std::monostate, std::string, double, int, bool> value)
+{
+    if (std::holds_alternative<std::string>(value)){
+        if (!std::get<std::string>(value).empty()){
+            m_value = value;
+        }
+    }
+    m_value = value;
+}
+
 std::shared_ptr<json::JsonObject> json::JsonObject::getChildByName(std::string_view name) const
 {
     if (!this->isObject()){

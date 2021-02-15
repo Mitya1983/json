@@ -28,9 +28,15 @@ public:
     //DESTRUCTOR
     ~JsonObject() = default;
 
-    //API
+    //MODIFY API
 
     void addObject(JsonObject &&object);
+    void setKey(std::string_view key) {m_key = key;}
+    void setIsArray(bool value) {m_array = value;}
+    void setValue(std::variant<std::monostate, std::string, double, int, bool> value);
+    void setBeautify(bool value) {m_beautifyOutput = value;}
+    //READ API
+
 
     std::shared_ptr<JsonObject> getChildByName(std::string_view name) const;
 
@@ -71,10 +77,7 @@ private:
     bool m_beautifyOutput;
     //SETTERS AND GETTERS
 public:
-    void setKey(std::string_view key) {m_key = key;}
-    void setIsArray(bool value) {m_array = value;}
-    void setValue(std::variant<std::monostate, std::string, double, int, bool> value) {m_value = value;}
-    void setBeautify(bool value) {m_beautifyOutput = value;}
+
 };
 
 std::ostream &operator<<(std::ostream &output, const JsonObject &jsonObject);
