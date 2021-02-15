@@ -58,6 +58,7 @@ public:
     bool isDouble() const;
     bool isInt() const;
     bool isBool() const;
+    bool isNull() const;
 
 protected:
     void _addChildsFromObject(std::string_view jsonData);

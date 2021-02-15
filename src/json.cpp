@@ -145,6 +145,11 @@ bool json::JsonObject::isBool() const
     return std::holds_alternative<bool>(m_value);
 }
 
+bool json::JsonObject::isNull() const
+{
+    return std::holds_alternative<std::monostate>(m_value);
+}
+
 void json::JsonObject::_addChildsFromObject(std::string_view jsonData)
 {
     auto childs = parseObject(jsonData);
