@@ -19,7 +19,11 @@ public:
     //CONSTRUCTORS
     JsonObject();
     JsonObject(std::string_view jsonData);
-    JsonObject(std::string_view key, std::variant<std::monostate, std::string, double, int, bool> value);
+    JsonObject(std::string_view key, std::monostate);
+    JsonObject(std::string_view key, std::string_view value);
+    JsonObject(std::string_view key, double value);
+    JsonObject(std::string_view key, int value);
+    JsonObject(std::string_view key, bool value);
     JsonObject(const JsonObject&) = delete;
     JsonObject(JsonObject&&) = default;
     //OPERATORS
@@ -32,9 +36,12 @@ public:
 
     void addObject(JsonObject &&object);
     void setKey(std::string_view key) {m_key = key;}
-    void setIsArray(bool value) {m_array = value;}
-    void setValue(std::variant<std::monostate, std::string, double, int, bool> value);
-    void setBeautify(bool value) {m_beautifyOutput = value;}
+    void setIsArray(bool value = true) {m_array = value;}
+    void setValue(std::string_view value);
+    void setValue(double value);
+    void setValue(int value);
+    void setValue(bool value);
+    void setBeautify(bool value = true) {m_beautifyOutput = value;}
     //READ API
 
 
@@ -71,7 +78,7 @@ protected:
 
 private:
     std::string m_key;
-    std::variant<std::monostate, std::string, double, int, bool> m_value;
+    std::variant<std::monostate, std::unique_ptr<std::string>, double, int, bool> m_value;
     std::vector<std::shared_ptr<JsonObject>> m_childs;
     bool m_root;
     bool m_array;

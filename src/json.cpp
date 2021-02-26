@@ -32,7 +32,35 @@ json::JsonObject::JsonObject(std::string_view jsonData) : m_root(true), m_array(
 
 }
 
-json::JsonObject::JsonObject(std::string_view key, std::variant<std::monostate, std::string, double, int, bool> value) :
+json::JsonObject::JsonObject(std::string_view key, std::monostate) :
+    m_key(key),
+    m_array(false)
+{
+
+}
+
+json::JsonObject::JsonObject(std::string_view key, std::string_view value) :
+    m_key(key),
+    m_array(false)
+{
+    m_value = std::make_unique<std::string>(value);
+}
+
+json::JsonObject::JsonObject(std::string_view key, double value) :
+    m_key(key),
+    m_array(false)
+{
+    m_value = value;
+}
+
+json::JsonObject::JsonObject(std::string_view key, int value) :
+    m_key(key),
+    m_array(false)
+{
+    m_value = value;
+}
+
+json::JsonObject::JsonObject(std::string_view key, bool value) :
     m_key(key),
     m_array(false)
 {
@@ -55,13 +83,25 @@ void json::JsonObject::addObject(json::JsonObject &&object)
     m_childs.emplace_back(std::make_shared<json::JsonObject>(std::move(object)));
 }
 
-void json::JsonObject::setValue(std::variant<std::monostate, std::string, double, int, bool> value)
+void json::JsonObject::setValue(std::string_view value)
 {
-    if (std::holds_alternative<std::string>(value)){
-        if (!std::get<std::string>(value).empty()){
-            m_value = value;
-        }
+    if (!value.empty()){
+        m_value = std::make_unique<std::string>(value);
     }
+}
+
+void json::JsonObject::setValue(double value)
+{
+    m_value = value;
+}
+
+void json::JsonObject::setValue(int value)
+{
+    m_value = value;
+}
+
+void json::JsonObject::setValue(bool value)
+{
     m_value = value;
 }
 
@@ -93,7 +133,7 @@ std::string json::JsonObject::toString() const
     if(std::holds_alternative<std::monostate>(m_value)){
         return "";
     }
-    return std::get<std::string>(m_value);
+    return *std::get<std::unique_ptr<std::string>>(m_value);
 }
 
 double json::JsonObject::toDouble() const
@@ -127,7 +167,7 @@ bool json::JsonObject::isArray() const
 
 bool json::JsonObject::isString() const
 {
-    return std::holds_alternative<std::string>(m_value);
+    return std::holds_alternative<std::unique_ptr<std::string>>(m_value);
 }
 
 bool json::JsonObject::isDouble() const
@@ -276,12 +316,12 @@ std::string json::JsonObject::_toStream() const
         }
         returnValue += ']';
     }
-    else if (std::holds_alternative<std::string>(m_value)){
+    else if (std::holds_alternative<std::unique_ptr<std::string>>(m_value)){
         if (!returnJustValue){
             returnValue += "\"" + m_key + "\":";
         }
         returnValue += "\"";
-        returnValue += std::get<std::string>(m_value);
+        returnValue += *std::get<std::unique_ptr<std::string>>(m_value);
         returnValue += "\"";
     }
     else if (std::holds_alternative<double>(m_value)){
@@ -374,7 +414,7 @@ std::string json::JsonObject::_toStream_b(uint8_t level) const
         }
         returnValue += "]";
     }
-    else if (std::holds_alternative<std::string>(m_value)){
+    else if (std::holds_alternative<std::unique_ptr<std::string>>(m_value)){
         for (int levelCount = 0; levelCount < level; ++levelCount){
             returnValue += spacer;
         }
@@ -382,7 +422,7 @@ std::string json::JsonObject::_toStream_b(uint8_t level) const
             returnValue += "\"" + m_key + "\": ";
         }
         returnValue += "\"";
-        returnValue += std::get<std::string>(m_value);
+        returnValue += *std::get<std::unique_ptr<std::string>>(m_value);
         returnValue += "\"";
     }
     else if (std::holds_alternative<double>(m_value)){
