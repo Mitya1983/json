@@ -70,8 +70,8 @@ json::JsonObject::JsonObject(std::string_view key, bool value) :
 void json::JsonObject::addObject(json::JsonObject &&object)
 {
     object.m_root = false;
-    if (m_childs.size() != 0){
-        for (auto child : m_childs){
+    if (!m_childs.empty()){
+        for (const auto &child : m_childs){
             if (child->m_key == object.m_key && !m_array){
                 std::string msg = "The key [" + object.m_key + "] is already present.\n" \
                                   "Dublicate Keys are not valid in this context.\n" \
@@ -287,7 +287,8 @@ std::string json::JsonObject::_toStream() const
         returnJustValue = true;
     }
     if (this->isObject()){
-        size_t objectNumber = 1, objectCount = m_childs.size();
+        size_t objectNumber = 1;
+        size_t objectCount = m_childs.size();
         if (!returnJustValue){
             if (!m_root){
                 returnValue += "\"" + m_key + "\":";
@@ -303,7 +304,8 @@ std::string json::JsonObject::_toStream() const
         returnValue += '}';
     }
     else if (this->isArray()){
-        size_t objectNumber = 1, objectCount = m_childs.size();
+        size_t objectNumber = 1;
+        size_t objectCount = m_childs.size();
         if (!returnJustValue){
             returnValue += "\"" + m_key + "\":";
         }
@@ -374,7 +376,8 @@ std::string json::JsonObject::_toStream_b(uint8_t level) const
         for (int levelCount = 0; levelCount < level; ++levelCount){
             returnValue += spacer;
         }
-        size_t objectNumber = 1, objectCount = m_childs.size();
+        size_t objectNumber = 1;
+        size_t objectCount = m_childs.size();
         if (!returnJustValue){
             if (!m_root){
                 returnValue += "\"" + m_key + "\":";
@@ -397,7 +400,8 @@ std::string json::JsonObject::_toStream_b(uint8_t level) const
         for (int levelCount = 0; levelCount < level; ++levelCount){
             returnValue += spacer;
         }
-        size_t objectNumber = 1, objectCount = m_childs.size();
+        size_t objectNumber = 1;
+        size_t objectCount = m_childs.size();
         if (!returnJustValue){
             returnValue += "\"" + m_key + "\":";
         }
