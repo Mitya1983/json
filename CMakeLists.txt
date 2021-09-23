@@ -1,34 +1,22 @@
 cmake_minimum_required(VERSION 3.17)
 
-option(BUILD_STATIC "Build static lib" OFF)
-option(BUILD_SHARED "Build shared lib" ON)
-
-if (BUILD_STATIC)
-	set(BUILD_SHARED OFF)
-endif()
+include(CustomFunctions.cmake)
 
 project(Json LANGUAGES CXX)
 
-set(LIB_NAME "json")
-
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-include_directories(
-	inc/
-	)
+set_project_properties()
 
-file (GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS
-	${PROJECT_SOURCE_DIR}/inc/*.hpp
-	${PROJECT_SOURCE_DIR}/src/*.cpp
-	)
+prepare_source_files(SRC_FILES)
 
-if(BUILD_SHARED)
-	add_library(${LIB_NAME} SHARED ${SRC_FILES})
-endif()
-if(BUILD_STATIC)
-	add_library(${LIB_NAME} STATIC ${SRC_FILES})
-endif()
+add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
 
-set_target_properties(${LIB_NAME} PROPERTIES VERSION 1.0)
-set_target_properties(${LIB_NAME} PROPERTIES LINKER_LANGUAGE CXX)
+set_target_properties(${PROJECT_NAME} PROPERTIES VERSION 1.0)
+set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "Json")
+
+install(TARGETS ${PROJECT_NAME}
+        CONFIGURATIONS ${CMAKE_BUILD_TYPE}
+        DESTINATION ${CMAKE_BUILD_TYPE}/lib)
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/inc DESTINATION ${CMAKE_BUILD_TYPE})

@@ -9,7 +9,7 @@ namespace {
 
 std::vector<std::string> parseObject(std::string_view jsonData);
 std::vector<std::string> parseArray(std::string_view jsonData);
-size_t findCloseBracket(const std::string jsonData, size_t openBracketPos, char openBracket);
+size_t findCloseBracket(const std::string &jsonData, size_t openBracketPos, char openBracket);
 
 } // namespace
 
@@ -117,7 +117,7 @@ std::shared_ptr<json::JsonObject> json::JsonObject::getChildByName(std::string_v
         }
         ++count;
     }
-    return std::shared_ptr<json::JsonObject>();
+    return {};
 }
 
 const std::vector<std::shared_ptr<json::JsonObject>> &json::JsonObject::toArray() const

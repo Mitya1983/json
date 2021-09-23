@@ -18,7 +18,7 @@ class JsonObject
 public:
     //CONSTRUCTORS
     JsonObject();
-    JsonObject(std::string_view jsonData);
+    explicit JsonObject(std::string_view jsonData);
     JsonObject(std::string_view key, std::monostate);
     JsonObject(std::string_view key, std::string_view value);
     JsonObject(std::string_view key, double value);
@@ -45,51 +45,48 @@ public:
     //READ API
 
 
-    std::shared_ptr<JsonObject> getChildByName(std::string_view name) const;
+    [[nodiscard]] auto getChildByName(std::string_view name) const -> std::shared_ptr<JsonObject>;
 
     ///Returns const reference to std::shared_ptr<JsonObject> or throws std::runtime_error otherwise.
-    const std::vector<std::shared_ptr<JsonObject>> &toArray() const;
+    [[nodiscard]] auto toArray() const -> const std::vector<std::shared_ptr<JsonObject>>&;
     ///Returns const std::string, which is empty if value in json was [null] and std::bad_variant_access if value is not string.
     ///This function returns only JsonObject:Value as a string and should not be used for file or stream generation. Use operator<<() instead.
-    std::string toString() const;
+    [[nodiscard]] auto toString() const -> std::string;
     ///Returns const double or throws std::bad_variant_access otherwise.
-    double toDouble() const;
+    [[nodiscard]] auto toDouble() const -> double;
     ///Returns const int or throws std::bad_variant_access otherwise.
-    int toInt() const;
+    [[nodiscard]] auto toInt() const -> int;
     ///Returns const int or throws std::bad_variant_access otherwise.
-    bool toBool() const;
-
-    bool isObject() const;
-    bool isArray() const;
-    bool isString() const;
-    bool isDouble() const;
-    bool isInt() const;
-    bool isBool() const;
-    bool isNull() const;
+    [[nodiscard]] auto toBool() const -> bool;
+    
+    [[nodiscard]] auto isObject() const -> bool;
+    [[nodiscard]] auto isArray() const -> bool;
+    [[nodiscard]] auto isString() const -> bool;
+    [[nodiscard]] auto isDouble() const -> bool;
+    [[nodiscard]] auto isInt() const -> bool;
+    [[nodiscard]] auto isBool() const -> bool;
+    [[nodiscard]] auto isNull() const -> bool;
 
 protected:
     void _addChildsFromObject(std::string_view jsonData);
     void _addChildsFromArray(std::string_view jsonData);
 
-    std::string _toStream() const;
-    std::string _toStream_b(uint8_t level = 0) const;
-    std::string _getKey(std::string_view jsonData);
-    std::string _getValue(std::string_view jsonData);
+    [[nodiscard]] auto _toStream() const -> std::string;
+    [[nodiscard]] auto _toStream_b(uint8_t level = 0) const -> std::string;
+    [[nodiscard]] auto _getKey(std::string_view jsonData) -> std::string;
+    [[nodiscard]] auto _getValue(std::string_view jsonData) -> std::string;
 
 private:
     std::string m_key;
     std::variant<std::monostate, std::unique_ptr<std::string>, double, int, bool> m_value;
     std::vector<std::shared_ptr<JsonObject>> m_childs;
-    bool m_root;
+    bool m_root{};
     bool m_array;
-    bool m_beautifyOutput;
-    //SETTERS AND GETTERS
-public:
-
+    bool m_beautifyOutput{};
 };
 
-std::ostream &operator<<(std::ostream &output, const JsonObject &jsonObject);
-std::stringstream &operator<<(std::stringstream &output, const JsonObject &jsonObject);
+auto operator<<(std::ostream &output, const JsonObject &jsonObject) -> std::ostream &;
+auto operator<<(std::stringstream &output, const JsonObject &jsonObject) -> std::stringstream &;
 
 } // namespace json
 
