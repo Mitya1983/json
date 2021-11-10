@@ -22,7 +22,7 @@ public:
     JsonObject(std::string_view key, std::monostate);
     JsonObject(std::string_view key, std::string_view value);
     JsonObject(std::string_view key, double value);
-    JsonObject(std::string_view key, int value);
+    JsonObject(std::string_view key, int64_t value);
     JsonObject(std::string_view key, bool value);
     JsonObject(const JsonObject&) = delete;
     JsonObject(JsonObject&&) = default;

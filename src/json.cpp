@@ -53,7 +53,7 @@ tristan::json::JsonObject::JsonObject(std::string_view key, double value) :
     m_value = value;
 }
 
-tristan::json::JsonObject::JsonObject(std::string_view key, int value) :
+tristan::json::JsonObject::JsonObject(std::string_view key, int64_t value) :
     m_key(key),
     m_array(false)
 {
