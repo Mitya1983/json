@@ -39,7 +39,7 @@ public:
     void setIsArray(bool value = true) {m_array = value;}
     void setValue(std::string_view value);
     void setValue(double value);
-    void setValue(int value);
+    void setValue(int64_t value);
     void setValue(bool value);
     void setBeautify(bool value = true) {m_beautifyOutput = value;}
     //READ API
@@ -50,12 +50,12 @@ public:
     ///Returns const reference to std::shared_ptr<JsonObject> or throws std::runtime_error otherwise.
     [[nodiscard]] auto toArray() const -> const std::vector<std::shared_ptr<JsonObject>>&;
     ///Returns const std::string, which is empty if value in json was [null] and std::bad_variant_access if value is not string.
-    ///This function returns only JsonObject:Value as a string and should not be used for file or stream generation. Use operator<<() instead.
+    ///This function returns only JsonObject:Value as a string and should not be used for file or stream generation. Use operator '<<' instead.
     [[nodiscard]] auto toString() const -> std::string;
     ///Returns const double or throws std::bad_variant_access otherwise.
     [[nodiscard]] auto toDouble() const -> double;
     ///Returns const int or throws std::bad_variant_access otherwise.
-    [[nodiscard]] auto toInt() const -> int;
+    [[nodiscard]] auto toInt() const -> int64_t;
     ///Returns const int or throws std::bad_variant_access otherwise.
     [[nodiscard]] auto toBool() const -> bool;
     
@@ -78,7 +78,7 @@ protected:
 
 private:
     std::string m_key;
-    std::variant<std::monostate, std::unique_ptr<std::string>, double, int, bool> m_value;
+    std::variant<std::monostate, std::unique_ptr<std::string>, double, int64_t, bool> m_value;
     std::vector<std::shared_ptr<JsonObject>> m_childs;
     bool m_root{};
     bool m_array;

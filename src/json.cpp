@@ -95,7 +95,7 @@ void tristan::json::JsonObject::setValue(double value)
     m_value = value;
 }
 
-void tristan::json::JsonObject::setValue(int value)
+void tristan::json::JsonObject::setValue(int64_t value)
 {
     m_value = value;
 }
@@ -141,9 +141,9 @@ double tristan::json::JsonObject::toDouble() const
     return std::get<double>(m_value);
 }
 
-int tristan::json::JsonObject::toInt() const
+int64_t tristan::json::JsonObject::toInt() const
 {
-    return std::get<int>(m_value);
+    return std::get<int64_t>(m_value);
 }
 
 bool tristan::json::JsonObject::toBool() const
@@ -177,7 +177,7 @@ bool tristan::json::JsonObject::isDouble() const
 
 bool tristan::json::JsonObject::isInt() const
 {
-    return std::holds_alternative<int>(m_value);
+    return std::holds_alternative<int64_t>(m_value);
 }
 
 bool tristan::json::JsonObject::isBool() const
@@ -224,7 +224,7 @@ void tristan::json::JsonObject::_addChildsFromObject(std::string_view jsonData)
                     object.setValue(std::stod(value));
                 }
                 else{
-                    object.setValue(std::stoi(value));
+                    object.setValue(std::stol(value));
                 }
             }
             else{
@@ -266,7 +266,7 @@ void tristan::json::JsonObject::_addChildsFromArray(std::string_view jsonData)
                     object.setValue(std::stod(value));
                 }
                 else{
-                    object.setValue(std::stoi(value));
+                    object.setValue(std::stol(value));
                 }
             }
             else{
@@ -337,11 +337,11 @@ std::string tristan::json::JsonObject::_toStream() const
         }
         returnValue += number;
     }
-    else if (std::holds_alternative<int>(m_value)){
+    else if (std::holds_alternative<int64_t>(m_value)){
         if (!returnJustValue){
             returnValue += "\"" + m_key + "\":";
         }
-        returnValue += std::to_string(std::get<int>(m_value));
+        returnValue += std::to_string(std::get<int64_t>(m_value));
     }
     else if (std::holds_alternative<bool>(m_value)){
         if (!returnJustValue){
@@ -443,14 +443,14 @@ std::string tristan::json::JsonObject::_toStream_b(uint8_t level) const
         }
         returnValue += number;
     }
-    else if (std::holds_alternative<int>(m_value)){
+    else if (std::holds_alternative<int64_t>(m_value)){
         for (int levelCount = 0; levelCount < level; ++levelCount){
             returnValue += spacer;
         }
         if (!returnJustValue){
             returnValue += "\"" + m_key + "\": ";
         }
-        returnValue += std::to_string(std::get<int>(m_value));
+        returnValue += std::to_string(std::get<int64_t>(m_value));
     }
     else if (std::holds_alternative<bool>(m_value)){
         for (int levelCount = 0; levelCount < level; ++levelCount){
