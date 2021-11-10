@@ -8,7 +8,7 @@
 #include <ostream>
 #include <sstream>
 
-namespace json {
+namespace tristan::json {
 
 class JsonObject
 {
@@ -88,6 +88,6 @@ private:
 auto operator<<(std::ostream &output, const JsonObject &jsonObject) -> std::ostream &;
 auto operator<<(std::stringstream &output, const JsonObject &jsonObject) -> std::stringstream &;
 
-} // namespace json
+} // namespace tristan::json
 
 #endif // JSON_HPP

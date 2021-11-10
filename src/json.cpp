@@ -13,12 +13,12 @@ size_t findCloseBracket(const std::string &jsonData, size_t openBracketPos, char
 
 } // namespace
 
-json::JsonObject::JsonObject() : m_root(true), m_array(false), m_beautifyOutput(false)
+tristan::json::JsonObject::JsonObject() : m_root(true), m_array(false), m_beautifyOutput(false)
 {
     m_value = std::monostate();
 }
 
-json::JsonObject::JsonObject(std::string_view jsonData) : m_root(true), m_array(false), m_beautifyOutput(false)
+tristan::json::JsonObject::JsonObject(std::string_view jsonData) : m_root(true), m_array(false), m_beautifyOutput(false)
 {
     m_value = std::monostate();
     std::string data(jsonData);
@@ -32,50 +32,50 @@ json::JsonObject::JsonObject(std::string_view jsonData) : m_root(true), m_array(
 
 }
 
-json::JsonObject::JsonObject(std::string_view key, std::monostate) :
+tristan::json::JsonObject::JsonObject(std::string_view key, std::monostate) :
     m_key(key),
     m_array(false)
 {
 
 }
 
-json::JsonObject::JsonObject(std::string_view key, std::string_view value) :
+tristan::json::JsonObject::JsonObject(std::string_view key, std::string_view value) :
     m_key(key),
     m_array(false)
 {
     m_value = std::make_unique<std::string>(value);
 }
 
-json::JsonObject::JsonObject(std::string_view key, double value) :
+tristan::json::JsonObject::JsonObject(std::string_view key, double value) :
     m_key(key),
     m_array(false)
 {
     m_value = value;
 }
 
-json::JsonObject::JsonObject(std::string_view key, int value) :
+tristan::json::JsonObject::JsonObject(std::string_view key, int value) :
     m_key(key),
     m_array(false)
 {
     m_value = value;
 }
 
-json::JsonObject::JsonObject(std::string_view key, bool value) :
+tristan::json::JsonObject::JsonObject(std::string_view key, bool value) :
     m_key(key),
     m_array(false)
 {
     m_value = value;
 }
 
-void json::JsonObject::addObject(json::JsonObject &&object)
+void tristan::json::JsonObject::addObject(json::JsonObject &&object)
 {
     object.m_root = false;
     if (!m_childs.empty()){
         for (const auto &child : m_childs){
             if (child->m_key == object.m_key && !m_array){
                 std::string msg = "The key [" + object.m_key + "] is already present.\n" \
-                                  "Dublicate Keys are not valid in this context.\n" \
-                                  "Dublicate keys are valid only if JsonObject is set to Array.";
+                                  "Duplicate Keys are not valid in this context.\n" \
+                                  "Duplicate keys are valid only if JsonObject is set to Array.";
                 throw std::invalid_argument(msg);
             }
         }
@@ -83,29 +83,29 @@ void json::JsonObject::addObject(json::JsonObject &&object)
     m_childs.emplace_back(std::make_shared<json::JsonObject>(std::move(object)));
 }
 
-void json::JsonObject::setValue(std::string_view value)
+void tristan::json::JsonObject::setValue(std::string_view value)
 {
     if (!value.empty()){
         m_value = std::make_unique<std::string>(value);
     }
 }
 
-void json::JsonObject::setValue(double value)
+void tristan::json::JsonObject::setValue(double value)
 {
     m_value = value;
 }
 
-void json::JsonObject::setValue(int value)
+void tristan::json::JsonObject::setValue(int value)
 {
     m_value = value;
 }
 
-void json::JsonObject::setValue(bool value)
+void tristan::json::JsonObject::setValue(bool value)
 {
     m_value = value;
 }
 
-std::shared_ptr<json::JsonObject> json::JsonObject::getChildByName(std::string_view name) const
+std::shared_ptr<tristan::json::JsonObject> tristan::json::JsonObject::getChildByName(std::string_view name) const
 {
     if (!this->isObject()){
         throw std::runtime_error("const json::JsonObject &json::JsonObject::getChildByName(std::string_view name): [this] is not an Object");
@@ -120,7 +120,7 @@ std::shared_ptr<json::JsonObject> json::JsonObject::getChildByName(std::string_v
     return {};
 }
 
-const std::vector<std::shared_ptr<json::JsonObject>> &json::JsonObject::toArray() const
+const std::vector<std::shared_ptr<tristan::json::JsonObject>> &tristan::json::JsonObject::toArray() const
 {
     if (!m_array){
         throw std::runtime_error("JsonObject is not an array");
@@ -128,7 +128,7 @@ const std::vector<std::shared_ptr<json::JsonObject>> &json::JsonObject::toArray(
     return m_childs;
 }
 
-std::string json::JsonObject::toString() const
+std::string tristan::json::JsonObject::toString() const
 {
     if(std::holds_alternative<std::monostate>(m_value)){
         return "";
@@ -136,22 +136,22 @@ std::string json::JsonObject::toString() const
     return *std::get<std::unique_ptr<std::string>>(m_value);
 }
 
-double json::JsonObject::toDouble() const
+double tristan::json::JsonObject::toDouble() const
 {
     return std::get<double>(m_value);
 }
 
-int json::JsonObject::toInt() const
+int tristan::json::JsonObject::toInt() const
 {
     return std::get<int>(m_value);
 }
 
-bool json::JsonObject::toBool() const
+bool tristan::json::JsonObject::toBool() const
 {
     return std::get<bool>(m_value);
 }
 
-bool json::JsonObject::isObject() const
+bool tristan::json::JsonObject::isObject() const
 {
     if (!m_childs.empty() && !m_array){
         return true;
@@ -160,37 +160,37 @@ bool json::JsonObject::isObject() const
     return false;
 }
 
-bool json::JsonObject::isArray() const
+bool tristan::json::JsonObject::isArray() const
 {
     return !m_childs.empty() && m_array;
 }
 
-bool json::JsonObject::isString() const
+bool tristan::json::JsonObject::isString() const
 {
     return std::holds_alternative<std::unique_ptr<std::string>>(m_value);
 }
 
-bool json::JsonObject::isDouble() const
+bool tristan::json::JsonObject::isDouble() const
 {
     return std::holds_alternative<double>(m_value);
 }
 
-bool json::JsonObject::isInt() const
+bool tristan::json::JsonObject::isInt() const
 {
     return std::holds_alternative<int>(m_value);
 }
 
-bool json::JsonObject::isBool() const
+bool tristan::json::JsonObject::isBool() const
 {
     return std::holds_alternative<bool>(m_value);
 }
 
-bool json::JsonObject::isNull() const
+bool tristan::json::JsonObject::isNull() const
 {
     return std::holds_alternative<std::monostate>(m_value);
 }
 
-void json::JsonObject::_addChildsFromObject(std::string_view jsonData)
+void tristan::json::JsonObject::_addChildsFromObject(std::string_view jsonData)
 {
     auto childs = parseObject(jsonData);
     for (const auto &child : childs){
@@ -237,7 +237,7 @@ void json::JsonObject::_addChildsFromObject(std::string_view jsonData)
     }
 }
 
-void json::JsonObject::_addChildsFromArray(std::string_view jsonData)
+void tristan::json::JsonObject::_addChildsFromArray(std::string_view jsonData)
 {
     auto childs = parseArray(jsonData);
     for (const auto &child : childs){
@@ -279,7 +279,7 @@ void json::JsonObject::_addChildsFromArray(std::string_view jsonData)
     }
 }
 
-std::string json::JsonObject::_toStream() const
+std::string tristan::json::JsonObject::_toStream() const
 {
     std::string returnValue;
     bool returnJustValue = false;
@@ -364,7 +364,7 @@ std::string json::JsonObject::_toStream() const
     return returnValue;
 }
 
-std::string json::JsonObject::_toStream_b(uint8_t level) const
+std::string tristan::json::JsonObject::_toStream_b(uint8_t level) const
 {
     std::string returnValue;
     const std::string spacer = "  ";
@@ -479,7 +479,7 @@ std::string json::JsonObject::_toStream_b(uint8_t level) const
     return returnValue;
 }
 
-std::string json::JsonObject::_getKey(std::string_view jsonData)
+std::string tristan::json::JsonObject::_getKey(std::string_view jsonData)
 {
     std::string data(jsonData);
     auto keyStartPos = data.find('\"') + 1;
@@ -493,7 +493,7 @@ std::string json::JsonObject::_getKey(std::string_view jsonData)
     return data.substr(keyStartPos, keyEndPos - keyStartPos);
 }
 
-std::string json::JsonObject::_getValue(std::string_view jsonData)
+std::string tristan::json::JsonObject::_getValue(std::string_view jsonData)
 {
     std::string data(jsonData);
     auto separatorPos = data.find(':');
@@ -527,7 +527,7 @@ std::string json::JsonObject::_getValue(std::string_view jsonData)
     return data.substr(valueStartPos, valueEndPos - valueStartPos);
 }
 
-std::ostream &json::operator<<(std::ostream &output, const json::JsonObject &jsonObject)
+std::ostream &tristan::json::operator<<(std::ostream &output, const json::JsonObject &jsonObject)
 {
     if (jsonObject.m_beautifyOutput){
         output << jsonObject._toStream_b();
@@ -538,7 +538,7 @@ std::ostream &json::operator<<(std::ostream &output, const json::JsonObject &jso
     return output;
 }
 
-std::stringstream &json::operator<<(std::stringstream &output, const json::JsonObject &jsonObject)
+std::stringstream &tristan::json::operator<<(std::stringstream &output, const json::JsonObject &jsonObject)
 {
     if (jsonObject.m_beautifyOutput){
         output << jsonObject._toStream_b();
@@ -619,7 +619,7 @@ std::vector<std::string> parseArray(std::string_view jsonData){
     return childs;
 }
 
-size_t findCloseBracket(const std::string jsonData, size_t openBracketPos, char openBracket){
+size_t findCloseBracket(const std::string& jsonData, size_t openBracketPos, char openBracket){
 
     size_t returnValue = 0;
     char closeBracket;
@@ -639,7 +639,7 @@ size_t findCloseBracket(const std::string jsonData, size_t openBracketPos, char 
     }
 
     std::stack<size_t> openBrackets;
-    for (int i = openBracketPos, n = jsonData.size(); i < n; ++i){
+    for (size_t i = openBracketPos, n = jsonData.size(); i < n; ++i){
         if (jsonData.at(i) == openBracket){
             openBrackets.push(i);
         }

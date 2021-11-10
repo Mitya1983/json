@@ -1,4 +1,4 @@
-function(prepare_source_files SRC_FILES)
+ function(prepare_source_files SRC_FILES)
     if (NOT EXISTS ${PROJECT_SOURCE_DIR}/inc/)
         message("Creating inc directory")
         file(MAKE_DIRECTORY ${PROJECT_SOURCE_DIR}/inc/)
