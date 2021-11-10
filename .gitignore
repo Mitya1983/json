@@ -33,3 +33,10 @@
 
 #Build Folder
 build/
+/cmake-build-debug/
+/cmake-build-release/
+/.idea/.name
+/.idea/JSON.iml
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/vcs.xml
