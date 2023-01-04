@@ -68,21 +68,19 @@ public:
     [[nodiscard]] auto isNull() const -> bool;
 
 protected:
-    void _addChildsFromObject(std::string_view jsonData);
-    void _addChildsFromArray(std::string_view jsonData);
+    void _addChildrenFromObject(const std::string& jsonData);
+    void _addChildrenFromArray(const std::string& jsonData);
 
     [[nodiscard]] auto _toStream() const -> std::string;
     [[nodiscard]] auto _toStream_b(uint8_t level = 0) const -> std::string;
-    [[nodiscard]] auto _getKey(std::string_view jsonData) -> std::string;
-    [[nodiscard]] auto _getValue(std::string_view jsonData) -> std::string;
 
 private:
     std::string m_key;
     std::variant<std::monostate, std::unique_ptr<std::string>, double, int64_t, bool> m_value;
-    std::vector<std::shared_ptr<JsonObject>> m_childs;
-    bool m_root{};
+    std::vector<std::shared_ptr<JsonObject>> m_children;
+    bool m_root;
     bool m_array;
-    bool m_beautifyOutput{};
+    bool m_beautifyOutput;
 };
 
 auto operator<<(std::ostream &output, const JsonObject &jsonObject) -> std::ostream &;
