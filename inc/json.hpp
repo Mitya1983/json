@@ -10,82 +10,215 @@
 
 namespace tristan::json {
 
-class JsonObject
-{
+    class JsonObject {
 
-    friend std::ostream &operator<<(std::ostream &output, const JsonObject &JsonObject);
-    friend std::stringstream &operator<<(std::stringstream &output, const JsonObject &JsonObject);
-public:
-    //CONSTRUCTORS
-    JsonObject();
-    explicit JsonObject(std::string_view jsonData);
-    JsonObject(std::string_view key, std::monostate);
-    JsonObject(std::string_view key, std::string_view value);
-    JsonObject(std::string_view key, double value);
-    JsonObject(std::string_view key, int64_t value);
-    JsonObject(std::string_view key, bool value);
-    JsonObject(const JsonObject&) = delete;
-    JsonObject(JsonObject&&) = default;
-    //OPERATORS
-    JsonObject& operator=(const JsonObject&) = delete;
-    JsonObject& operator=(JsonObject&&) = default;
-    //DESTRUCTOR
-    ~JsonObject() = default;
+        friend auto operator<<(std::ostream& output, const JsonObject& JsonObject) -> std::ostream&;
+        friend auto operator<<(std::stringstream& output, const JsonObject& JsonObject) -> std::stringstream&;
 
-    //MODIFY API
+    public:
+        /**
+         * \brief Default constructor
+         * Object become the root, not array, will not beautify output and value is empty
+         */
+        JsonObject();
+        /**
+         * \overload
+         * \brief Constructor
+         * Parses json data provided as a string
+         * \param jsonData const std::string&
+         */
+        explicit JsonObject(const std::string& jsonData);
+        /**
+         * \overload
+         * \brief Constructor
+         * \param key std::string
+         */
+        JsonObject(std::string  key, std::monostate);
+        /**
+         * \overload
+         * \brief Constructor
+         * \param key std::string
+         * \param value std::string
+         */
+        JsonObject(std::string  key, std::string value);
+        /**
+         * \overload
+         * \brief Constructor
+         * \param key std::string
+         * \param value double
+         */
+        JsonObject(std::string  key, double value);
+        /**
+         * \overload
+         * \brief Constructor
+         * \param key std::string
+         * \param value int64_t
+         */
+        JsonObject(std::string  key, int64_t value);
+        /**
+         * \overload
+         * \brief Constructor
+         * \param key std::string
+         * \param value bool
+         */
+        JsonObject(std::string  key, bool value);
+        JsonObject(const JsonObject&) = delete;
+        /**
+         * \brief Move constructor
+         */
+        JsonObject(JsonObject&&) = default;
+        JsonObject& operator=(const JsonObject&) = delete;
+        /**
+         * \brief Move assignment operator
+         * \return JsonObject&
+         */
+        JsonObject& operator=(JsonObject&&) = default;
+        /**
+         * \brief Destructor
+         */
+        ~JsonObject() = default;
 
-    void addObject(JsonObject &&object);
-    void setKey(std::string_view key) {m_key = key;}
-    void setIsArray(bool value = true) {m_array = value;}
-    void setValue(std::string_view value);
-    void setValue(double value);
-    void setValue(int64_t value);
-    void setValue(bool value);
-    void setBeautify(bool value = true) {m_beautifyOutput = value;}
-    //READ API
+        /**
+         * \brief Adds object as a child
+         * \param object JsonObject&&
+         */
+        void addObject(JsonObject&& object);
 
+        /**
+         * \brief Sets object as an array object which allows to have multiple elements with the same key
+         * \param value bool. Default is true.
+         */
+        void setIsArray(bool value = true) { m_array = value; }
 
-    [[nodiscard]] auto getChildByName(std::string_view name) const -> std::shared_ptr<JsonObject>;
+        /**
+         * \brief Sets key
+         * \param key std::string
+         */
+        void setKey(std::string key);
+        /**
+         * \brief Sets value
+         * \param value std::string
+         */
+        void setValue(std::string value);
+        /**
+         * \brief Sets value
+         * \param value double
+         */
+        void setValue(double value);
+        /**
+         * \brief Sets value
+         * \param value int64_t
+         */
+        void setValue(int64_t value);
+        /**
+         * \brief Sets value
+         * \param value bool
+         */
+        void setValue(bool value);
+        /**
+         * \brief Sets if beauty output should be provided by operator << and docToString()
+         * \param value bool. Default is true
+         */
+        void setBeautify(bool value = true);
 
-    ///Returns const reference to std::shared_ptr<JsonObject> or throws std::runtime_error otherwise.
-    [[nodiscard]] auto toArray() const -> const std::vector<std::shared_ptr<JsonObject>>&;
-    ///Returns const std::string, which is empty if value in json was [null] and std::bad_variant_access if value is not string.
-    ///This function returns only JsonObject:Value as a string and should not be used for file or stream generation. Use operator '<<' instead.
-    [[nodiscard]] auto toString() const -> std::string;
-    ///Returns const double or throws std::bad_variant_access otherwise.
-    [[nodiscard]] auto toDouble() const -> double;
-    ///Returns const int or throws std::bad_variant_access otherwise.
-    [[nodiscard]] auto toInt() const -> int64_t;
-    ///Returns const int or throws std::bad_variant_access otherwise.
-    [[nodiscard]] auto toBool() const -> bool;
-    
-    [[nodiscard]] auto isObject() const -> bool;
-    [[nodiscard]] auto isArray() const -> bool;
-    [[nodiscard]] auto isString() const -> bool;
-    [[nodiscard]] auto isDouble() const -> bool;
-    [[nodiscard]] auto isInt() const -> bool;
-    [[nodiscard]] auto isBool() const -> bool;
-    [[nodiscard]] auto isNull() const -> bool;
+        /**
+         * \brief Searches through the children.
+         * \param name const std::string&
+         * \return std::shared_ptr< JsonObject >
+         */
+        [[nodiscard]] auto getChildByName(const std::string& name) const -> std::shared_ptr< JsonObject >;
 
-protected:
-    void _addChildrenFromObject(const std::string& jsonData);
-    void _addChildrenFromArray(const std::string& jsonData);
+        /**
+         * \brief Returns list of children objects as an array if object is set as being an array.
+         * \return const std::vector< std::shared_ptr< JsonObject > >&
+         * \throws std::runtime_error
+         */
+        [[nodiscard]] auto toArray() const -> const std::vector< std::shared_ptr< JsonObject > >&;
+        /**
+         * \brief Returns object as a string.
+         * \return std::string
+         * \throws std::bad_variant_access
+         */
+        [[nodiscard]] auto toString() const -> std::string;
+        /**
+         * \brief Returns object as a double.
+         * \return double
+         * \throws std::bad_variant_access
+         */
+        [[nodiscard]] auto toDouble() const -> double;
+        /**
+         * \brief Returns object as an int64_t.
+         * \return int64_t
+         * \throws std::bad_variant_access
+         */
+        [[nodiscard]] auto toInt() const -> int64_t;
+        /**
+         * \brief Returns object as a bool.
+         * \return bool
+         * \throws std::bad_variant_access
+         */
+        [[nodiscard]] auto toBool() const -> bool;
+        /**
+         * \brief Provides printable json document
+         * \return std::string
+         */
+        [[nodiscard]] auto docToString() const -> std::string;
 
-    [[nodiscard]] auto _toStream() const -> std::string;
-    [[nodiscard]] auto _toStream_b(uint8_t level = 0) const -> std::string;
+        /**
+         * \brief Checks if instance is an object (aka holds child elements and is not an array)
+         * \return bool
+         */
+        [[nodiscard]] auto isObject() const -> bool;
+        /**
+         * \brief Checks if instance is an array
+         * \return bool
+         */
+        [[nodiscard]] auto isArray() const -> bool;
+        /**
+         * \brief Checks if json instance holds a value as a string
+         * \return bool
+         */
+        [[nodiscard]] auto isString() const -> bool;
+        /**
+         * \brief Checks if json instance holds a value as a double
+         * \return bool
+         */
+        [[nodiscard]] auto isDouble() const -> bool;
+        /**
+         * \brief Checks if json instance holds a value as an int64_t
+         * \return bool
+         */
+        [[nodiscard]] auto isInt() const -> bool;
+        /**
+         * \brief Checks if json instance holds a value as a bool
+         * \return bool
+         */
+        [[nodiscard]] auto isBool() const -> bool;
+        /**
+         * \brief Checks if json instance holds a value as an empty value
+         * \return bool
+         */
+        [[nodiscard]] auto isNull() const -> bool;
 
-private:
-    std::string m_key;
-    std::variant<std::monostate, std::unique_ptr<std::string>, double, int64_t, bool> m_value;
-    std::vector<std::shared_ptr<JsonObject>> m_children;
-    bool m_root;
-    bool m_array;
-    bool m_beautifyOutput;
-};
+    protected:
+        void _addChildrenFromObject(const std::string& jsonData);
+        void _addChildrenFromArray(const std::string& jsonData);
 
-auto operator<<(std::ostream &output, const JsonObject &jsonObject) -> std::ostream &;
-auto operator<<(std::stringstream &output, const JsonObject &jsonObject) -> std::stringstream &;
+        [[nodiscard]] auto _toStream() const -> std::string;
+        [[nodiscard]] auto _toStream_b(uint8_t level = 0) const -> std::string;
 
-} // namespace tristan::json
+    private:
+        std::string m_key;
+        std::variant< std::monostate, std::unique_ptr< std::string >, double, int64_t, bool > m_value;
+        std::vector< std::shared_ptr< JsonObject > > m_children;
+        bool m_root;
+        bool m_array;
+        bool m_beautifyOutput;
+    };
 
-#endif // JSON_HPP
+    auto operator<<(std::ostream& output, const JsonObject& jsonObject) -> std::ostream&;
+    auto operator<<(std::stringstream& output, const JsonObject& jsonObject) -> std::stringstream&;
+
+}  // namespace tristan::json
+
+#endif  // JSON_HPP
