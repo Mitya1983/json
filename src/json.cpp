@@ -4,6 +4,7 @@
 #include <stack>
 #include <locale>
 #include <cassert>
+#include <utility>
 
 namespace {
 
@@ -11,8 +12,8 @@ namespace {
     [[nodiscard]] auto getValue(const std::string& json_data) -> std::string;
     std::vector< std::string > parseObject(const std::string& json_data);
     std::vector< std::string > parseArray(const std::string& json_data);
-//    [[maybe_unused]] size_t
-//        findCloseBracket(const std::string& jsonData, size_t openBracketPos, char openBracket);
+    //    [[maybe_unused]] size_t
+    //        findCloseBracket(const std::string& jsonData, size_t openBracketPos, char openBracket);
 
 }  // namespace
 
@@ -23,52 +24,51 @@ tristan::json::JsonObject::JsonObject() :
     m_value = std::monostate();
 }
 
-tristan::json::JsonObject::JsonObject(std::string_view jsonData) :
+tristan::json::JsonObject::JsonObject(const std::string& jsonData) :
     m_root(true),
     m_array(false),
     m_beautifyOutput(false) {
     m_value = std::monostate();
-    std::string data(jsonData);
-    if (data.at(0) == '{') {
-        this->_addChildrenFromObject(data);
-    } else if (data.at(0) == '[') {
+    if (jsonData.at(0) == '{') {
+        this->_addChildrenFromObject(jsonData);
+    } else if (jsonData.at(0) == '[') {
         m_array = true;
-        this->_addChildrenFromArray(data);
+        this->_addChildrenFromArray(jsonData);
     }
 }
 
-tristan::json::JsonObject::JsonObject(std::string_view key, std::monostate) :
-    m_key(key),
+tristan::json::JsonObject::JsonObject(std::string key, std::monostate) :
+    m_key(std::move(key)),
     m_root(true),
     m_array(false),
     m_beautifyOutput(false) { }
 
-tristan::json::JsonObject::JsonObject(std::string_view key, std::string_view value) :
-    m_key(key),
+tristan::json::JsonObject::JsonObject(std::string key, std::string value) :
+    m_key(std::move(key)),
     m_root(true),
     m_array(false),
     m_beautifyOutput(false) {
-    m_value = std::make_unique< std::string >(value);
+    m_value = std::make_unique< std::string >(std::move(value));
 }
 
-tristan::json::JsonObject::JsonObject(std::string_view key, double value) :
-    m_key(key),
-    m_root(true),
-    m_array(false),
-    m_beautifyOutput(false) {
-    m_value = value;
-}
-
-tristan::json::JsonObject::JsonObject(std::string_view key, int64_t value) :
-    m_key(key),
+tristan::json::JsonObject::JsonObject(std::string key, double value) :
+    m_key(std::move(key)),
     m_root(true),
     m_array(false),
     m_beautifyOutput(false) {
     m_value = value;
 }
 
-tristan::json::JsonObject::JsonObject(std::string_view key, bool value) :
-    m_key(key),
+tristan::json::JsonObject::JsonObject(std::string key, int64_t value) :
+    m_key(std::move(key)),
+    m_root(true),
+    m_array(false),
+    m_beautifyOutput(false) {
+    m_value = value;
+}
+
+tristan::json::JsonObject::JsonObject(std::string key, bool value) :
+    m_key(std::move(key)),
     m_root(true),
     m_array(false),
     m_beautifyOutput(false) {
@@ -91,9 +91,11 @@ void tristan::json::JsonObject::addObject(json::JsonObject&& object) {
     m_children.emplace_back(std::make_shared< json::JsonObject >(std::move(object)));
 }
 
-void tristan::json::JsonObject::setValue(std::string_view value) {
+void tristan::json::JsonObject::setKey(std::string key) { m_key = std::move(key); }
+
+void tristan::json::JsonObject::setValue(std::string value) {
     if (!value.empty()) {
-        m_value = std::make_unique< std::string >(value);
+        m_value = std::make_unique< std::string >(std::move(value));
     }
 }
 
@@ -103,11 +105,14 @@ void tristan::json::JsonObject::setValue(int64_t value) { m_value = value; }
 
 void tristan::json::JsonObject::setValue(bool value) { m_value = value; }
 
+void tristan::json::JsonObject::setBeautify(bool value) { m_beautifyOutput = value; }
+
 std::shared_ptr< tristan::json::JsonObject >
-    tristan::json::JsonObject::getChildByName(std::string_view name) const {
+    tristan::json::JsonObject::getChildByName(const std::string& name) const {
     if (!this->isObject()) {
-        throw std::runtime_error("const json::JsonObject &json::JsonObject::getChildByName(std::string_view "
-                                 "name): [this] is not an Object");
+        throw std::runtime_error(
+            "const json::JsonObject &json::JsonObject::getChildByName(const std::string& "
+            "name): [this] is not an Object");
     }
     for (const auto& child: m_children) {
         if (child->m_key == name) {
@@ -138,6 +143,13 @@ int64_t tristan::json::JsonObject::toInt() const { return std::get< int64_t >(m_
 
 bool tristan::json::JsonObject::toBool() const { return std::get< bool >(m_value); }
 
+auto tristan::json::JsonObject::docToString() const -> std::string {
+    if (m_beautifyOutput) {
+        return _toStream_b();
+    }
+    return _toStream();
+}
+
 bool tristan::json::JsonObject::isObject() const {
     if (!m_children.empty() && !m_array) {
         return true;
@@ -160,7 +172,7 @@ bool tristan::json::JsonObject::isBool() const { return std::holds_alternative< 
 
 bool tristan::json::JsonObject::isNull() const { return std::holds_alternative< std::monostate >(m_value); }
 
-void tristan::json::JsonObject::_addChildrenFromObject(const std::string& jsonData) {//NOLINT
+void tristan::json::JsonObject::_addChildrenFromObject(const std::string& jsonData) {  //NOLINT
     auto children = parseObject(jsonData);
     for (const auto& child: children) {
         json::JsonObject object;
@@ -199,7 +211,7 @@ void tristan::json::JsonObject::_addChildrenFromObject(const std::string& jsonDa
     }
 }
 
-void tristan::json::JsonObject::_addChildrenFromArray(const std::string& jsonData) {//NOLINT
+void tristan::json::JsonObject::_addChildrenFromArray(const std::string& jsonData) {  //NOLINT
     auto children = parseArray(jsonData);
     for (const auto& child: children) {
         json::JsonObject object;
@@ -234,7 +246,7 @@ void tristan::json::JsonObject::_addChildrenFromArray(const std::string& jsonDat
     }
 }
 
-std::string tristan::json::JsonObject::_toStream() const {//NOLINT
+std::string tristan::json::JsonObject::_toStream() const {  //NOLINT
     std::string returnValue;
     bool returnJustValue = false;
     if (m_key.empty()) {
@@ -311,7 +323,7 @@ std::string tristan::json::JsonObject::_toStream() const {//NOLINT
     return returnValue;
 }
 
-std::string tristan::json::JsonObject::_toStream_b(uint8_t level) const {//NOLINT
+std::string tristan::json::JsonObject::_toStream_b(uint8_t level) const {  //NOLINT
     std::string returnValue;
     const std::string spacer = "  ";
     bool returnJustValue = false;
@@ -438,7 +450,7 @@ std::stringstream& tristan::json::operator<<(std::stringstream& output, const js
 
 namespace {
 
-    auto getKey(const std::string& json_data) -> std::string{
+    auto getKey(const std::string& json_data) -> std::string {
 
         auto keyStartPos = json_data.find('\"') + 1;
         auto check = json_data.find('{');
@@ -451,7 +463,7 @@ namespace {
         return json_data.substr(keyStartPos, keyEndPos - keyStartPos);
     }
 
-    auto getValue(const std::string& json_data) -> std::string{
+    auto getValue(const std::string& json_data) -> std::string {
         auto separatorPos = json_data.find(':');
         if (separatorPos == std::string::npos) {
             separatorPos = 0;
@@ -539,41 +551,5 @@ namespace {
         }
         return children;
     }
-
-//    size_t findCloseBracket(const std::string& jsonData, size_t openBracketPos, char openBracket) {
-//
-//        size_t returnValue = 0;
-//        char closeBracket;
-//        switch (openBracket) {
-//            case '{': {
-//                closeBracket = '}';
-//                break;
-//            }
-//            case '[': {
-//                closeBracket = ']';
-//                break;
-//            }
-//            default: {
-//                throw std::invalid_argument(
-//                    "size_t findCloseBracket(const std::string jsonData, size_t openBracketPos, char "
-//                    "openBracket): openBracket has invalid value");
-//            }
-//        }
-//
-//        std::stack< size_t > openBrackets;
-//        for (size_t i = openBracketPos, n = jsonData.size(); i < n; ++i) {
-//            if (jsonData.at(i) == openBracket) {
-//                openBrackets.push(i);
-//            }
-//            if (jsonData.at(i) == closeBracket) {
-//                openBrackets.pop();
-//                if (openBrackets.empty()) {
-//                    returnValue = i;
-//                    break;
-//                }
-//            }
-//        }
-//        return returnValue;
-//    }
 
 }  // namespace
