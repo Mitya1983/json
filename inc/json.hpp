@@ -33,35 +33,35 @@ namespace tristan::json {
          * \brief Constructor
          * \param key std::string
          */
-        JsonObject(std::string  key, std::monostate);
+        JsonObject(std::string key, std::monostate);
         /**
          * \overload
          * \brief Constructor
          * \param key std::string
          * \param value std::string
          */
-        JsonObject(std::string  key, std::string value);
+        JsonObject(std::string key, std::string value);
         /**
          * \overload
          * \brief Constructor
          * \param key std::string
          * \param value double
          */
-        JsonObject(std::string  key, double value);
+        JsonObject(std::string key, double value);
         /**
          * \overload
          * \brief Constructor
          * \param key std::string
          * \param value int64_t
          */
-        JsonObject(std::string  key, int64_t value);
+        JsonObject(std::string key, int64_t value);
         /**
          * \overload
          * \brief Constructor
          * \param key std::string
          * \param value bool
          */
-        JsonObject(std::string  key, bool value);
+        JsonObject(std::string key, bool value);
         JsonObject(const JsonObject&) = delete;
         /**
          * \brief Move constructor

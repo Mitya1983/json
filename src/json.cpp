@@ -107,12 +107,10 @@ void tristan::json::JsonObject::setValue(bool value) { m_value = value; }
 
 void tristan::json::JsonObject::setBeautify(bool value) { m_beautifyOutput = value; }
 
-std::shared_ptr< tristan::json::JsonObject >
-    tristan::json::JsonObject::getChildByName(const std::string& name) const {
+std::shared_ptr< tristan::json::JsonObject > tristan::json::JsonObject::getChildByName(const std::string& name) const {
     if (!this->isObject()) {
-        throw std::runtime_error(
-            "const json::JsonObject &json::JsonObject::getChildByName(const std::string& "
-            "name): [this] is not an Object");
+        throw std::runtime_error("const json::JsonObject &json::JsonObject::getChildByName(const std::string& "
+                                 "name): [this] is not an Object");
     }
     for (const auto& child: m_children) {
         if (child->m_key == name) {
@@ -122,8 +120,7 @@ std::shared_ptr< tristan::json::JsonObject >
     return {};
 }
 
-const std::vector< std::shared_ptr< tristan::json::JsonObject > >&
-    tristan::json::JsonObject::toArray() const {
+const std::vector< std::shared_ptr< tristan::json::JsonObject > >& tristan::json::JsonObject::toArray() const {
     if (!m_array) {
         throw std::runtime_error("JsonObject is not an array");
     }
@@ -160,9 +157,7 @@ bool tristan::json::JsonObject::isObject() const {
 
 bool tristan::json::JsonObject::isArray() const { return !m_children.empty() && m_array; }
 
-bool tristan::json::JsonObject::isString() const {
-    return std::holds_alternative< std::unique_ptr< std::string > >(m_value);
-}
+bool tristan::json::JsonObject::isString() const { return std::holds_alternative< std::unique_ptr< std::string > >(m_value); }
 
 bool tristan::json::JsonObject::isDouble() const { return std::holds_alternative< double >(m_value); }
 
