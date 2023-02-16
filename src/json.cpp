@@ -27,7 +27,7 @@ tristan::json::JsonObject::JsonObject(const std::string& jsonData) :
     m_root(true),
     m_array(false),
     m_beautifyOutput(false) {
-    if (jsonData.empty()){
+    if (jsonData.empty()) {
         return;
     }
     if (jsonData.at(0) == '{') {
@@ -43,7 +43,7 @@ tristan::json::JsonObject::JsonObject(std::string key, std::monostate) :
     m_value(std::monostate()),
     m_root(true),
     m_array(false),
-    m_beautifyOutput(false){ }
+    m_beautifyOutput(false) { }
 
 tristan::json::JsonObject::JsonObject(std::string key, std::string value) :
     m_key(std::move(key)),
@@ -167,7 +167,7 @@ bool tristan::json::JsonObject::isInt() const { return std::holds_alternative< i
 
 bool tristan::json::JsonObject::isBool() const { return std::holds_alternative< bool >(m_value); }
 
-bool tristan::json::JsonObject::isNull() const { return std::holds_alternative< std::monostate >(m_value); }
+bool tristan::json::JsonObject::isNull() const { return std::holds_alternative< std::monostate >(m_value) and m_children.empty(); }
 
 void tristan::json::JsonObject::_addChildrenFromObject(const std::string& jsonData) {  //NOLINT
     auto children = parseObject(jsonData);
