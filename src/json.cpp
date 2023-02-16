@@ -12,8 +12,6 @@ namespace {
     [[nodiscard]] auto getValue(const std::string& json_data) -> std::string;
     std::vector< std::string > parseObject(const std::string& json_data);
     std::vector< std::string > parseArray(const std::string& json_data);
-    //    [[maybe_unused]] size_t
-    //        findCloseBracket(const std::string& jsonData, size_t openBracketPos, char openBracket);
 
 }  // namespace
 
@@ -25,10 +23,13 @@ tristan::json::JsonObject::JsonObject() :
 }
 
 tristan::json::JsonObject::JsonObject(const std::string& jsonData) :
+    m_value(std::monostate()),
     m_root(true),
     m_array(false),
     m_beautifyOutput(false) {
-    m_value = std::monostate();
+    if (jsonData.empty()){
+        return;
+    }
     if (jsonData.at(0) == '{') {
         this->_addChildrenFromObject(jsonData);
     } else if (jsonData.at(0) == '[') {
@@ -39,9 +40,10 @@ tristan::json::JsonObject::JsonObject(const std::string& jsonData) :
 
 tristan::json::JsonObject::JsonObject(std::string key, std::monostate) :
     m_key(std::move(key)),
+    m_value(std::monostate()),
     m_root(true),
     m_array(false),
-    m_beautifyOutput(false) { }
+    m_beautifyOutput(false){ }
 
 tristan::json::JsonObject::JsonObject(std::string key, std::string value) :
     m_key(std::move(key)),
