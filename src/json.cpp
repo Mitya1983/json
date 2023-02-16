@@ -467,14 +467,14 @@ namespace {
         } else {
             ++separatorPos;
         }
-        auto valueStartPos = json_data.find('[', separatorPos);
+        auto valueStartPos = json_data.find('{', separatorPos);
         auto valueEndPos = valueStartPos;
         if (valueStartPos != std::string::npos) {
-            valueEndPos = json_data.find_last_of(']') + 1;
+            valueEndPos = json_data.find_last_of('}') + 1;
         } else {
-            valueStartPos = json_data.find('{', separatorPos);
+            valueStartPos = json_data.find('[', separatorPos);
             if (valueStartPos != std::string::npos) {
-                valueEndPos = json_data.find_last_of('}') + 1;
+                valueEndPos = json_data.find_last_of(']') + 1;
             } else {
                 valueStartPos = json_data.find('\"', separatorPos);
                 if (valueStartPos != std::string::npos) {
