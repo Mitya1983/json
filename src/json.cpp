@@ -138,7 +138,7 @@ auto tristan::json::JsonElement::isBool() const -> bool { return std::holds_alte
 
 auto tristan::json::JsonElement::isNull() const -> bool { return std::holds_alternative<std::monostate>(m_value); }
 
-auto tristan::json::JsonElement::getChildByName(const std::string& name) -> std::shared_ptr< JsonElement > {
+auto tristan::json::JsonElement::getChildByName(const std::string& name) -> std::shared_ptr< tristan::json::JsonElement > {
     if (m_array){
         return {};
     }

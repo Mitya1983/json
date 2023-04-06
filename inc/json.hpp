@@ -216,6 +216,14 @@ namespace tristan::json {
          */
         [[nodiscard]] auto isNull() const -> bool;
 
+        /**
+         * \brief Searches through the children.
+         * Search is made not recursively
+         * \param name const std::string&
+         * \return std::shared_ptr< JsonElement > which is empty if child was not found
+         * \throws std::bad_variant_access if value is this is not an object
+         */
+        [[nodiscard]] auto getChildByName(const std::string& name) -> std::shared_ptr<JsonElement>;
     protected:
 
     private:
