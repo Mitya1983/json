@@ -112,11 +112,6 @@ namespace tristan::json {
          * \param element JsonElement&&
          */
         void addElement(std::shared_ptr< JsonElement > element);
-        //        /**
-        //         * \brief Sets key
-        //         * \param key std::string
-        //         */
-        //        void setKey(std::string key);
         /**
          * \brief Sets value
          * \param value std::string

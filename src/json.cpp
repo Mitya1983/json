@@ -72,6 +72,7 @@ void tristan::json::JsonElement::addElement(std::shared_ptr<JsonElement> element
     if (std::holds_alternative<Children>(m_value)) {
         auto &children = std::get<Children>(m_value);
         if (children.empty()) {
+            element->m_key ? m_object = true : m_array = true;
             children.emplace_back(std::move(element));
             return;
         }
