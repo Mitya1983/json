@@ -138,6 +138,20 @@ auto tristan::json::JsonElement::isBool() const -> bool { return std::holds_alte
 
 auto tristan::json::JsonElement::isNull() const -> bool { return std::holds_alternative<std::monostate>(m_value); }
 
+auto tristan::json::JsonElement::getChildByName(const std::string& name) -> std::shared_ptr< JsonElement > {
+    if (m_array){
+        return {};
+    }
+
+    const auto& children = std::get<Children>(m_value);
+    for (const auto& child: children) {
+        if (child->m_key == name){
+            return child;
+        }
+    }
+    return {};
+}
+
 auto tristan::json::JsonElement::print() -> std::string {
     std::string result;
     if (m_key) {
