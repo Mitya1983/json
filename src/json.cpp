@@ -14,7 +14,7 @@ tristan::json::JsonElement::JsonElement() :
 tristan::json::JsonElement::JsonElement(std::string string, ArgumentType argument_type) :
     m_key(std::nullopt),
     m_value(std::monostate()),
-    m_object(true),
+    m_object(false),
     m_array(false) {
     if (argument_type == ArgumentType::KEY) {
         m_key = std::move(string);
