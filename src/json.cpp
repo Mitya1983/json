@@ -6,14 +6,16 @@
 #include <queue>
 
 tristan::json::JsonElement::JsonElement() :
-        m_key(std::nullopt),
-        m_value(std::monostate()),
-        m_object(false),
-        m_array(false) {}
+    m_key(std::nullopt),
+    m_value(std::monostate()),
+    m_object(false),
+    m_array(false) { }
 
 tristan::json::JsonElement::JsonElement(std::string string, ArgumentType argument_type) :
-        m_object(true),
-        m_array(false) {
+    m_key(std::nullopt),
+    m_value(std::monostate()),
+    m_object(false),
+    m_array(false) {
     if (argument_type == ArgumentType::KEY) {
         m_key = std::move(string);
         m_value = std::monostate();
@@ -23,55 +25,59 @@ tristan::json::JsonElement::JsonElement(std::string string, ArgumentType argumen
     }
 }
 
-tristan::json::JsonElement::JsonElement(std::string key, std::string value) :
-        m_key(std::move(key)),
-        m_value(std::move(value)),
-        m_object(false),
-        m_array(false) {}
+tristan::json::JsonElement::JsonElement(const char* string, tristan::json::ArgumentType argument_type) :
+    tristan::json::JsonElement(std::string(string), argument_type) { }
 
-tristan::json::JsonElement::JsonElement(std::string key, double value) :
-        m_key(std::move(key)),
-        m_value(value),
-        m_object(false),
-        m_array(false) {}
+tristan::json::JsonElement::JsonElement(std::string key, std::string value) :
+    m_key(std::move(key)),
+    m_value(std::move(value)),
+    m_object(false),
+    m_array(false) { }
+
+tristan::json::JsonElement::JsonElement(std::string p_key, double p_value) :
+    m_key(std::move(p_key)),
+    m_value(p_value),
+    m_object(false),
+    m_array(false) { }
 
 tristan::json::JsonElement::JsonElement(double value) :
-        m_key(std::nullopt),
-        m_value(value),
-        m_object(false),
-        m_array(false) {}
+    m_key(std::nullopt),
+    m_value(value),
+    m_object(false),
+    m_array(false) { }
 
 tristan::json::JsonElement::JsonElement(std::string key, int64_t value) :
-        m_key(std::move(key)),
-        m_value(value),
-        m_object(false),
-        m_array(false) {}
+    m_key(std::move(key)),
+    m_value(value),
+    m_object(false),
+    m_array(false) { }
 
 tristan::json::JsonElement::JsonElement(int64_t value) :
-        m_key(std::nullopt),
-        m_value(value),
-        m_object(false),
-        m_array(false) {}
+    m_key(std::nullopt),
+    m_value(value),
+    m_object(false),
+    m_array(false) { }
 
 tristan::json::JsonElement::JsonElement(std::string key, bool value) :
-        m_key(std::move(key)),
-        m_value(value),
-        m_object(false),
-        m_array(false) {}
+    m_key(std::move(key)),
+    m_value(value),
+    m_object(false),
+    m_array(false) { }
 
 tristan::json::JsonElement::JsonElement(bool value) :
-        m_key(std::nullopt),
-        m_value(value),
-        m_object(false),
-        m_array(false) {}
+    m_key(std::nullopt),
+    m_value(value),
+    m_object(false),
+    m_array(false) { }
 
-void tristan::json::JsonElement::addElement(std::shared_ptr<JsonElement> element) {
-    if (std::holds_alternative<std::monostate>(m_value)) {
+void tristan::json::JsonElement::addElement(std::shared_ptr< JsonElement > element) {
+    if (std::holds_alternative< std::monostate >(m_value)) {
         m_value = Children();
     }
-    if (std::holds_alternative<Children>(m_value)) {
-        auto &children = std::get<Children>(m_value);
+    if (std::holds_alternative< Children >(m_value)) {
+        auto& children = std::get< Children >(m_value);
         if (children.empty()) {
+            element->m_key ? m_object = true : m_array = true;
             children.emplace_back(std::move(element));
             return;
         }
@@ -79,7 +85,7 @@ void tristan::json::JsonElement::addElement(std::shared_ptr<JsonElement> element
             if (not element->m_key) {
                 throw std::invalid_argument("Trying to add child with key not set into json element");
             }
-            for (auto &child: children) {
+            for (auto& child: children) {
                 if (child->m_key == element->m_key) {
                     child = element;
                     return;
@@ -106,36 +112,50 @@ void tristan::json::JsonElement::setValue(int64_t value) { m_value = value; }
 
 void tristan::json::JsonElement::setValue(bool value) { m_value = value; }
 
-auto tristan::json::JsonElement::key() const -> const std::optional<std::string> & { return m_key; }
+auto tristan::json::JsonElement::key() const -> const std::optional< std::string >& { return m_key; }
 
-auto tristan::json::JsonElement::toArray() const -> const std::vector<std::shared_ptr<tristan::json::JsonElement> > & {
+auto tristan::json::JsonElement::toArray() const -> const std::vector< std::shared_ptr< tristan::json::JsonElement > >& {
     if (!m_array) {
         throw std::runtime_error("JsonElement is not an array");
     }
-    return std::get<Children>(m_value);
+    return std::get< Children >(m_value);
 }
 
-auto tristan::json::JsonElement::toString() const -> const std::string & { return std::get<std::string>(m_value); }
+auto tristan::json::JsonElement::toString() const -> const std::string& { return std::get< std::string >(m_value); }
 
-auto tristan::json::JsonElement::toDouble() const -> double { return std::get<double>(m_value); }
+auto tristan::json::JsonElement::toDouble() const -> double { return std::get< double >(m_value); }
 
-auto tristan::json::JsonElement::toInt() const -> int64_t { return std::get<int64_t>(m_value); }
+auto tristan::json::JsonElement::toInt() const -> int64_t { return std::get< int64_t >(m_value); }
 
-auto tristan::json::JsonElement::toBool() const -> bool { return std::get<bool>(m_value); }
+auto tristan::json::JsonElement::toBool() const -> bool { return std::get< bool >(m_value); }
 
 auto tristan::json::JsonElement::isObject() const -> bool { return m_object; }
 
 auto tristan::json::JsonElement::isArray() const -> bool { return m_array; }
 
-auto tristan::json::JsonElement::isString() const -> bool { return std::holds_alternative<std::string>(m_value); }
+auto tristan::json::JsonElement::isString() const -> bool { return std::holds_alternative< std::string >(m_value); }
 
-auto tristan::json::JsonElement::isDouble() const -> bool { return std::holds_alternative<double>(m_value); }
+auto tristan::json::JsonElement::isDouble() const -> bool { return std::holds_alternative< double >(m_value); }
 
-auto tristan::json::JsonElement::isInt() const -> bool { return std::holds_alternative<int64_t>(m_value); }
+auto tristan::json::JsonElement::isInt() const -> bool { return std::holds_alternative< int64_t >(m_value); }
 
-auto tristan::json::JsonElement::isBool() const -> bool { return std::holds_alternative<bool>(m_value); }
+auto tristan::json::JsonElement::isBool() const -> bool { return std::holds_alternative< bool >(m_value); }
 
-auto tristan::json::JsonElement::isNull() const -> bool { return std::holds_alternative<std::monostate>(m_value); }
+auto tristan::json::JsonElement::isNull() const -> bool { return std::holds_alternative< std::monostate >(m_value); }
+
+auto tristan::json::JsonElement::getChildByName(const std::string& name) -> std::shared_ptr< tristan::json::JsonElement > {
+    if (m_array) {
+        return {};
+    }
+
+    const auto& children = std::get< Children >(m_value);
+    for (const auto& child: children) {
+        if (child->m_key == name) {
+            return child;
+        }
+    }
+    return {};
+}
 
 auto tristan::json::JsonElement::print() -> std::string {
     std::string result;
@@ -145,47 +165,47 @@ auto tristan::json::JsonElement::print() -> std::string {
         result += "\":";
     }
     std::visit(
-            [&result, this](auto &&value) -> void {
-                using ValueType = std::decay_t<decltype(value)>;
-                if constexpr (std::is_same_v<ValueType, std::monostate>) {
-                    result += "null";
-                } else if constexpr (std::is_same_v<ValueType, std::string>) {
-                    result += '\"';
-                    result += tristan::json::JsonDoc::encodeStringValue(value);
-                    result += '\"';
-                } else if constexpr (std::is_same_v<ValueType, double> or std::is_same_v<ValueType, int64_t>) {
-                    result += std::to_string(value);
-                } else if constexpr (std::is_same_v<ValueType, bool>) {
-                    result += value ? "true" : "false";
-                } else if constexpr (std::is_same_v<ValueType, Children>) {
-                    if (m_object) {
-                        result += '{';
-                    } else if (m_array) {
-                        result += '[';
-                    }
-                    for (const auto &child: value) {
-                        result += child->print();
-                        if (child.get() == (value.end() - 1)->get()) {
-                            break;
-                        }
-                        result += ',';
-                    }
-                    if (m_object) {
-                        result += '}';
-                    } else if (m_array) {
-                        result += ']';
-                    }
+        [&result, this](auto&& value) -> void {
+            using ValueType = std::decay_t< decltype(value) >;
+            if constexpr (std::is_same_v< ValueType, std::monostate >) {
+                result += "null";
+            } else if constexpr (std::is_same_v< ValueType, std::string >) {
+                result += '\"';
+                result += tristan::json::JsonDoc::encodeStringValue(value);
+                result += '\"';
+            } else if constexpr (std::is_same_v< ValueType, double > or std::is_same_v< ValueType, int64_t >) {
+                result += std::to_string(value);
+            } else if constexpr (std::is_same_v< ValueType, bool >) {
+                result += value ? "true" : "false";
+            } else if constexpr (std::is_same_v< ValueType, Children >) {
+                if (m_object) {
+                    result += '{';
+                } else if (m_array) {
+                    result += '[';
                 }
-            },
-            m_value);
+                for (const auto& child: value) {
+                    result += child->print();
+                    if (child.get() == (value.end() - 1)->get()) {
+                        break;
+                    }
+                    result += ',';
+                }
+                if (m_object) {
+                    result += '}';
+                } else if (m_array) {
+                    result += ']';
+                }
+            }
+        },
+        m_value);
     return result;
 }
 
 tristan::json::JsonError::JsonError() :
-        place(std::string::npos) {}
+    place(std::string::npos) { }
 
 tristan::json::JsonError::JsonError(uint64_t place_, char symbol) :
-        place(place_) {
+    place(place_) {
     description = "Unexpected symbol \'";
     description += symbol;
     description += '\'';
@@ -193,26 +213,24 @@ tristan::json::JsonError::JsonError(uint64_t place_, char symbol) :
 
 tristan::json::JsonError::operator bool() const { return place != std::string::npos; }
 
-std::ostream &tristan::json::operator<<(std::ostream &output, const json::JsonDoc &json_doc) {
+std::ostream& tristan::json::operator<<(std::ostream& output, const json::JsonDoc& json_doc) {
     output << json_doc.toString();
     return output;
 }
 
-std::stringstream &tristan::json::operator<<(std::stringstream &output, const json::JsonDoc &json_doc) {
+std::stringstream& tristan::json::operator<<(std::stringstream& output, const json::JsonDoc& json_doc) {
     output << json_doc.toString();
     return output;
 }
 
 tristan::json::JsonDoc::JsonDoc() :
-        m_object(false),
-        m_array(false),
-        m_beautify_output(false) {}
+    m_object(false),
+    m_array(false),
+    m_beautify_output(false) { }
 
-auto tristan::json::JsonDoc::createJsonDocument() -> std::shared_ptr<JsonDoc> {
-    return std::shared_ptr<JsonDoc>(new JsonDoc());
-}
+auto tristan::json::JsonDoc::createJsonDocument() -> std::shared_ptr< JsonDoc > { return std::shared_ptr< JsonDoc >(new JsonDoc()); }
 
-auto tristan::json::JsonDoc::createJsonDocument(const std::string &json_document) -> std::shared_ptr<JsonDoc> {
+auto tristan::json::JsonDoc::createJsonDocument(const std::string& json_document) -> std::shared_ptr< JsonDoc > {
     auto doc = createJsonDocument();
 
     bool key_parsed = false;
@@ -239,18 +257,16 @@ auto tristan::json::JsonDoc::createJsonDocument(const std::string &json_document
 
     ++current_parsing_pos;
 
-    std::stack<std::shared_ptr<JsonElement> > json_objects_stack;
+    std::stack< std::shared_ptr< JsonElement > > json_objects_stack;
 
     json_objects_stack.push(nullptr);
 
-    std::shared_ptr<JsonElement> current_object;
+    std::shared_ptr< JsonElement > current_object;
 
     for (auto n = json_document.size(); current_parsing_pos < n; ++current_parsing_pos) {
 
-        if (json_document[current_parsing_pos] == ' ' or json_document[current_parsing_pos] == '\n' or
-            json_document[current_parsing_pos] == '\t'
-            or json_document[current_parsing_pos] == '\b' or json_document[current_parsing_pos] == '\f' or
-            json_document[current_parsing_pos] == '\r') {
+        if (json_document[current_parsing_pos] == ' ' or json_document[current_parsing_pos] == '\n' or json_document[current_parsing_pos] == '\t'
+            or json_document[current_parsing_pos] == '\b' or json_document[current_parsing_pos] == '\f' or json_document[current_parsing_pos] == '\r') {
             continue;
         }
         previous_symbol = current_symbol;
@@ -264,9 +280,8 @@ auto tristan::json::JsonDoc::createJsonDocument(const std::string &json_document
         current_object = json_objects_stack.top();
 
         if (current_symbol == '{') {
-            if (previous_symbol == '[' or (previous_symbol == ',' and current_object and current_object->m_array) or
-                (not current_object and doc->m_array)) {
-                auto child = std::make_shared<JsonElement>();
+            if (previous_symbol == '[' or (previous_symbol == ',' and current_object and current_object->m_array) or (not current_object and doc->m_array)) {
+                auto child = std::make_shared< JsonElement >();
                 child->m_object = true;
                 json_objects_stack.emplace(child);
                 if (current_object) {
@@ -285,9 +300,8 @@ auto tristan::json::JsonDoc::createJsonDocument(const std::string &json_document
         }
 
         if (current_symbol == '[') {
-            if (previous_symbol == '[' or (previous_symbol == ',' and current_object and current_object->m_array) or
-                (not current_object and doc->m_array)) {
-                auto child = std::make_shared<JsonElement>();
+            if (previous_symbol == '[' or (previous_symbol == ',' and current_object and current_object->m_array) or (not current_object and doc->m_array)) {
+                auto child = std::make_shared< JsonElement >();
                 child->m_array = true;
                 json_objects_stack.emplace(child);
                 current_object->addElement(std::move(child));
@@ -312,14 +326,12 @@ auto tristan::json::JsonDoc::createJsonDocument(const std::string &json_document
                 json_objects_stack.pop();
                 continue;
             }
-            if (previous_symbol == 'e' and true_value_parsed and current_object->isBool() and
-                current_object->toBool()) {
+            if (previous_symbol == 'e' and true_value_parsed and current_object->isBool() and current_object->toBool()) {
                 true_value_parsed = false;
                 json_objects_stack.pop();
                 continue;
             }
-            if (previous_symbol == 'e' and false_value_parsed and current_object->isBool() and
-                not current_object->toBool()) {
+            if (previous_symbol == 'e' and false_value_parsed and current_object->isBool() and not current_object->toBool()) {
                 false_value_parsed = false;
                 json_objects_stack.pop();
                 continue;
@@ -330,11 +342,9 @@ auto tristan::json::JsonDoc::createJsonDocument(const std::string &json_document
                 continue;
             }
             if ((current_symbol == '}' and (previous_symbol == '{' or previous_symbol == '}' or previous_symbol == ']'))
-                or (current_symbol == ']' and
-                    (previous_symbol == '}' or previous_symbol == ']' or previous_symbol == '['))) {
+                or (current_symbol == ']' and (previous_symbol == '}' or previous_symbol == ']' or previous_symbol == '['))) {
                 if (current_object) {
-                    if (std::holds_alternative<Children>(current_object->m_value) and
-                        std::get<Children>(current_object->m_value).empty()) {
+                    if (std::holds_alternative< Children >(current_object->m_value) and std::get< Children >(current_object->m_value).empty()) {
                         current_object->m_value = std::monostate();
                     }
                 }
@@ -380,7 +390,7 @@ auto tristan::json::JsonDoc::createJsonDocument(const std::string &json_document
         if (current_symbol == '\"') {
             if (((current_object and current_object->m_object) or (not current_object and doc->m_object))
                 and (previous_symbol == '{' or previous_symbol == ',')) {
-                auto child = std::make_shared<JsonElement>();
+                auto child = std::make_shared< JsonElement >();
                 ++current_parsing_pos;
                 std::string key;
                 while (true) {
@@ -405,8 +415,7 @@ auto tristan::json::JsonDoc::createJsonDocument(const std::string &json_document
                 }
                 continue;
             }
-            if ((((current_object and current_object->m_array) or (not current_object and doc->m_array)) and
-                 (previous_symbol == '[' or previous_symbol == ','))
+            if ((((current_object and current_object->m_array) or (not current_object and doc->m_array)) and (previous_symbol == '[' or previous_symbol == ','))
                 or previous_symbol == ':') {
                 std::string value;
                 while (true) {
@@ -432,8 +441,7 @@ auto tristan::json::JsonDoc::createJsonDocument(const std::string &json_document
 
         if (current_symbol == '-' or (current_symbol >= '0' and current_symbol <= '9')) {
             if (previous_symbol == ':'
-                or (previous_symbol == ',' and
-                    ((current_object and current_object->m_array) or (not current_object and doc->m_array)))) {
+                or (previous_symbol == ',' and ((current_object and current_object->m_array) or (not current_object and doc->m_array)))) {
                 std::string value;
                 bool value_is_double = false;
                 while (true) {
@@ -441,15 +449,12 @@ auto tristan::json::JsonDoc::createJsonDocument(const std::string &json_document
                     ++current_parsing_pos;
                     previous_symbol = current_symbol;
                     current_symbol = json_document[current_parsing_pos];
-                    if ((current_symbol == '-' or current_symbol == '+') and
-                        not(previous_symbol == 'E' or previous_symbol == 'e')) {
+                    if ((current_symbol == '-' or current_symbol == '+') and not(previous_symbol == 'E' or previous_symbol == 'e')) {
                         doc->m_error = JsonError(current_parsing_pos, current_symbol);
                         return doc;
                     }
-                    if (current_symbol == ',' or current_symbol == '}' or current_symbol == ']' or
-                        current_symbol == ' ' or current_symbol == '\n'
-                        or current_symbol == '\t' or current_symbol == '\b' or current_symbol == '\f' or
-                        current_symbol == '\r') {
+                    if (current_symbol == ',' or current_symbol == '}' or current_symbol == ']' or current_symbol == ' ' or current_symbol == '\n'
+                        or current_symbol == '\t' or current_symbol == '\b' or current_symbol == '\f' or current_symbol == '\r') {
                         --current_parsing_pos;
                         current_symbol = json_document[current_parsing_pos];
                         break;
@@ -491,17 +496,14 @@ auto tristan::json::JsonDoc::createJsonDocument(const std::string &json_document
 
         if (current_symbol == 't') {
             if (previous_symbol == ':'
-                or (previous_symbol == ',' and
-                    ((current_object and current_object->m_array) or (not current_object and doc->m_array)))) {
+                or (previous_symbol == ',' and ((current_object and current_object->m_array) or (not current_object and doc->m_array)))) {
                 std::string value;
                 while (true) {
                     value += current_symbol;
                     ++current_parsing_pos;
                     current_symbol = json_document[current_parsing_pos];
-                    if (current_symbol == ',' or current_symbol == '}' or current_symbol == ']' or
-                        current_symbol == ' ' or current_symbol == '\n'
-                        or current_symbol == '\t' or current_symbol == '\b' or current_symbol == '\f' or
-                        current_symbol == '\r') {
+                    if (current_symbol == ',' or current_symbol == '}' or current_symbol == ']' or current_symbol == ' ' or current_symbol == '\n'
+                        or current_symbol == '\t' or current_symbol == '\b' or current_symbol == '\f' or current_symbol == '\r') {
                         --current_parsing_pos;
                         current_symbol = json_document[current_parsing_pos];
                         break;
@@ -525,24 +527,20 @@ auto tristan::json::JsonDoc::createJsonDocument(const std::string &json_document
 
         if (current_symbol == 'f') {
             if (previous_symbol == ':'
-                or (previous_symbol == ',' and
-                    ((current_object and current_object->m_array) or (not current_object and doc->m_array)))) {
+                or (previous_symbol == ',' and ((current_object and current_object->m_array) or (not current_object and doc->m_array)))) {
                 std::string value;
                 while (true) {
                     value += current_symbol;
                     ++current_parsing_pos;
                     current_symbol = json_document[current_parsing_pos];
-                    if (current_symbol == ',' or current_symbol == '}' or current_symbol == ']' or
-                        current_symbol == ' ' or current_symbol == '\n'
-                        or current_symbol == '\t' or current_symbol == '\b' or current_symbol == '\f' or
-                        current_symbol == '\r') {
+                    if (current_symbol == ',' or current_symbol == '}' or current_symbol == ']' or current_symbol == ' ' or current_symbol == '\n'
+                        or current_symbol == '\t' or current_symbol == '\b' or current_symbol == '\f' or current_symbol == '\r') {
                         --current_parsing_pos;
                         current_symbol = json_document[current_parsing_pos];
                         break;
                     }
                     if ((current_symbol == 'a' and value.size() == 1) or (current_symbol == 'l' and value.size() == 2)
-                        or (current_symbol == 's' and value.size() == 3) or
-                        (current_symbol == 'e' and value.size() == 4)) {
+                        or (current_symbol == 's' and value.size() == 3) or (current_symbol == 'e' and value.size() == 4)) {
                         continue;
                     }
                     doc->m_error = JsonError(current_parsing_pos, current_symbol);
@@ -560,17 +558,14 @@ auto tristan::json::JsonDoc::createJsonDocument(const std::string &json_document
 
         if (current_symbol == 'n') {
             if (previous_symbol == ':'
-                or (previous_symbol == ',' and
-                    ((current_object and current_object->m_array) or (not current_object and doc->m_array)))) {
+                or (previous_symbol == ',' and ((current_object and current_object->m_array) or (not current_object and doc->m_array)))) {
                 std::string value;
                 while (true) {
                     value += current_symbol;
                     ++current_parsing_pos;
                     current_symbol = json_document[current_parsing_pos];
-                    if (current_symbol == ',' or current_symbol == '}' or current_symbol == ']' or
-                        current_symbol == ' ' or current_symbol == '\n'
-                        or current_symbol == '\t' or current_symbol == '\b' or current_symbol == '\f' or
-                        current_symbol == '\r') {
+                    if (current_symbol == ',' or current_symbol == '}' or current_symbol == ']' or current_symbol == ' ' or current_symbol == '\n'
+                        or current_symbol == '\t' or current_symbol == '\b' or current_symbol == '\f' or current_symbol == '\r') {
                         --current_parsing_pos;
                         current_symbol = json_document[current_parsing_pos];
                         break;
@@ -598,7 +593,7 @@ auto tristan::json::JsonDoc::createJsonDocument(const std::string &json_document
 
 void tristan::json::JsonDoc::setAsArray() noexcept { m_array = true; }
 
-void tristan::json::JsonDoc::addChild(std::shared_ptr<JsonElement> element) {
+void tristan::json::JsonDoc::addChild(std::shared_ptr< JsonElement > element) {
     if (not m_object and not m_array) {
         if (element->m_key) {
             m_object = true;
@@ -614,7 +609,7 @@ void tristan::json::JsonDoc::addChild(std::shared_ptr<JsonElement> element) {
             m_children.emplace_back(std::move(element));
             return;
         }
-        for (auto &child: m_children) {
+        for (auto& child: m_children) {
             if (child->m_key == element->m_key) {
                 child = element;
                 return;
@@ -630,8 +625,7 @@ void tristan::json::JsonDoc::addChild(std::shared_ptr<JsonElement> element) {
 
 void tristan::json::JsonDoc::beautifyOutput(bool value) noexcept { m_beautify_output = value; }
 
-auto tristan::json::JsonDoc::getChildByName(const std::string &name,
-                                            bool recursively) const -> std::shared_ptr<JsonElement> {
+auto tristan::json::JsonDoc::getChildByName(const std::string& name, bool recursively) const -> std::shared_ptr< JsonElement > {
 
     if (m_children.empty()) {
         return {};
@@ -646,7 +640,7 @@ auto tristan::json::JsonDoc::getChildByName(const std::string &name,
             }
         }
     } else {
-        std::queue<std::shared_ptr<JsonElement> > search_queue;
+        std::queue< std::shared_ptr< JsonElement > > search_queue;
 
         for (auto child: m_children) {
             if (m_object) {
@@ -665,8 +659,8 @@ auto tristan::json::JsonDoc::getChildByName(const std::string &name,
         while (not search_queue.empty()) {
             auto child = search_queue.front();
             search_queue.pop();
-            if (std::holds_alternative<Children>(child->m_value)) {
-                const auto &sub_children = std::get<Children>(child->m_value);
+            if (std::holds_alternative< Children >(child->m_value)) {
+                const auto& sub_children = std::get< Children >(child->m_value);
                 for (auto sub_child: sub_children) {
                     if (sub_child->key() == name) {
                         return sub_child;
@@ -691,7 +685,7 @@ auto tristan::json::JsonDoc::toString() const -> std::string {
         json += '[';
     }
 
-    for (const auto &child: m_children) {
+    for (const auto& child: m_children) {
         json += child->print();
         if (child.get() == (m_children.end() - 1)->get()) {
             break;
@@ -704,13 +698,13 @@ auto tristan::json::JsonDoc::toString() const -> std::string {
     } else {
         json += ']';
     }
-    if (m_beautify_output){
+    if (m_beautify_output) {
         json = JsonDoc::beautifyOutput(json);
     }
     return json;
 }
 
-auto tristan::json::JsonDoc::error() const noexcept -> const tristan::json::JsonError & { return m_error; }
+auto tristan::json::JsonDoc::error() const noexcept -> const tristan::json::JsonError& { return m_error; }
 
 auto tristan::json::JsonDoc::encodeStringValue(std::string string_value) -> std::string {
     auto result(std::move(string_value));
@@ -729,35 +723,35 @@ auto tristan::json::JsonDoc::beautifyOutput(const std::string& json_doc, uint8_t
     result.reserve(json_doc.size());
     uint8_t level = 0;
     bool inside_string = false;
-    for (auto character = json_doc.begin(); character != json_doc.end(); ++character){
-        if (*character == '\"' and *(character - 1) != '\\'){
+    for (auto character = json_doc.begin(); character != json_doc.end(); ++character) {
+        if (*character == '\"' and *(character - 1) != '\\') {
             inside_string = !inside_string;
         }
-        if (inside_string){
+        if (inside_string) {
             result += *character;
             continue;
         }
-        if (*character == '{' or *character == '[' or *character == ','){
+        if (*character == '{' or *character == '[' or *character == ',') {
             result += *character;
             result += '\n';
             if (*character == '{' or *character == '[') {
                 ++level;
             }
             for (int i = 0; i < level; ++i) {
-                for (int j = 0; j < indent; ++j){
+                for (int j = 0; j < indent; ++j) {
                     result += ' ';
                 }
             }
-        } else if (*character == '}' or *character == ']'){
+        } else if (*character == '}' or *character == ']') {
             result += '\n';
             --level;
             for (int i = 0; i < level; ++i) {
-                for (int j = 0; j < indent; ++j){
+                for (int j = 0; j < indent; ++j) {
                     result += ' ';
                 }
             }
             result += *character;
-        } else{
+        } else {
             result += *character;
         }
     }
