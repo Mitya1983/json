@@ -38,22 +38,32 @@ namespace tristan::json {
          * If ArgumentType::KEY is used then JsonElement will be initiated as key:value pair
          * If ArgumentType::VALUE is used then JsonElement will initiated keyless, aka for use in a json arrays
          * \param key std::string
+         * \param argument_type ArgumentType. Defaulted to ArgumentType::KEY
          */
-        explicit JsonElement(std::string string, ArgumentType argument_type = ArgumentType::KEY);
+        explicit JsonElement(std::string p_string, ArgumentType p_argument_type = ArgumentType::KEY);
+        /**
+         * \overload
+         * \brief Creates object taking into account the second argument.
+         * If ArgumentType::KEY is used then JsonElement will be initiated as key:value pair
+         * If ArgumentType::VALUE is used then JsonElement will initiated keyless, aka for use in a json arrays
+         * \param key const char*
+         * \param argument_type ArgumentType. Defaulted to ArgumentType::KEY
+         */
+        explicit JsonElement(const char* p_string, ArgumentType p_argument_type = ArgumentType::KEY);
         /**
          * \overload
          * \brief Constructor
          * \param key std::string
          * \param value std::string
          */
-        JsonElement(std::string key, std::string value);
+        JsonElement(std::string p_key, std::string p_value);
         /**
          * \overload
          * \brief Constructor
-         * \param key std::string
-         * \param value double
+         * \param p_key std::string
+         * \param p_value double
          */
-        JsonElement(std::string key, double value);
+        JsonElement(std::string p_key, double p_value);
         /**
          * \overload
          * \brief Creates object which holds key as std::nullopt and thus may be used in array
