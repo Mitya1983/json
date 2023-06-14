@@ -318,27 +318,27 @@ auto tristan::json::JsonDoc::createJsonDocument(const std::string& json_document
         if (current_symbol == '}' or current_symbol == ']') {
             if (previous_symbol == '\"' and string_value_parsed) {
                 string_value_parsed = false;
-                json_objects_stack.pop();
+                //                json_objects_stack.pop();
                 continue;
             }
             if (previous_symbol >= '0' and previous_symbol <= '9' and number_value_parsed) {
                 number_value_parsed = false;
-                json_objects_stack.pop();
+                //                json_objects_stack.pop();
                 continue;
             }
-            if (previous_symbol == 'e' and true_value_parsed and current_object->isBool() and current_object->toBool()) {
+            if (previous_symbol == 'e' and true_value_parsed /* and current_object->isBool() and current_object->toBool()*/) {
                 true_value_parsed = false;
-                json_objects_stack.pop();
+                //                json_objects_stack.pop();
                 continue;
             }
-            if (previous_symbol == 'e' and false_value_parsed and current_object->isBool() and not current_object->toBool()) {
+            if (previous_symbol == 'e' and false_value_parsed /* and current_object->isBool() and not current_object->toBool()*/) {
                 false_value_parsed = false;
-                json_objects_stack.pop();
+                //                json_objects_stack.pop();
                 continue;
             }
-            if (previous_symbol == 'l' and null_value_parsed and current_object->isNull()) {
+            if (previous_symbol == 'l' and null_value_parsed /* and current_object->isNull()*/) {
                 null_value_parsed = false;
-                json_objects_stack.pop();
+                //                json_objects_stack.pop();
                 continue;
             }
             if ((current_symbol == '}' and (previous_symbol == '{' or previous_symbol == '}' or previous_symbol == ']'))
@@ -427,7 +427,11 @@ auto tristan::json::JsonDoc::createJsonDocument(const std::string& json_document
                     }
                     if (current_symbol == '\"' and previous_symbol != '\\') {
                         string_value_parsed = true;
-                        current_object->m_value = std::move(value);
+                        if (not current_object->isArray()) {
+                            current_object->m_value = std::move(value);
+                        } else {
+                            current_object->addElement(std::make_shared< tristan::json::JsonElement >(value, tristan::json::ArgumentType::VALUE));
+                        }
                         json_objects_stack.pop();
                         break;
                     }
@@ -482,9 +486,17 @@ auto tristan::json::JsonDoc::createJsonDocument(const std::string& json_document
                 }
                 number_value_parsed = true;
                 if (value_is_double) {
-                    current_object->m_value = std::stod(value);
+                    if (not current_object->isArray()) {
+                        current_object->m_value = std::stod(value);
+                    } else {
+                        current_object->addElement(std::make_shared< tristan::json::JsonElement >(std::stod(value)));
+                    }
                 } else {
-                    current_object->m_value = std::stoll(value);
+                    if (not current_object->isArray()) {
+                        current_object->m_value = std::stod(value);
+                    } else {
+                        current_object->addElement(std::make_shared< tristan::json::JsonElement >(static_cast< int64_t >(std::stoll(value))));
+                    }
                 }
                 json_objects_stack.pop();
                 continue;
@@ -516,7 +528,11 @@ auto tristan::json::JsonDoc::createJsonDocument(const std::string& json_document
                     return doc;
                 }
                 true_value_parsed = true;
-                current_object->m_value = true;
+                if (not current_object->isArray()) {
+                    current_object->m_value = true;
+                } else {
+                    current_object->addElement(std::make_shared< tristan::json::JsonElement >(true));
+                }
                 json_objects_stack.pop();
                 continue;
             } else {
@@ -547,7 +563,11 @@ auto tristan::json::JsonDoc::createJsonDocument(const std::string& json_document
                     return doc;
                 }
                 false_value_parsed = true;
-                current_object->m_value = false;
+                if (not current_object->isArray()) {
+                    current_object->m_value = false;
+                } else {
+                    current_object->addElement(std::make_shared< tristan::json::JsonElement >(false));
+                }
                 json_objects_stack.pop();
                 continue;
             } else {
@@ -578,7 +598,11 @@ auto tristan::json::JsonDoc::createJsonDocument(const std::string& json_document
                     return doc;
                 }
                 null_value_parsed = true;
-                //                current_object->m_value = value;
+                if (not current_object->isArray()) {
+                    current_object->m_value = std::monostate();
+                } else {
+                    current_object->addElement(std::make_shared< tristan::json::JsonElement >());
+                }
                 json_objects_stack.pop();
                 continue;
             } else {
