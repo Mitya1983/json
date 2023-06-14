@@ -494,7 +494,7 @@ auto tristan::json::JsonDoc::createJsonDocument(const std::string& json_document
                     }
                 } else {
                     if (not current_object->m_array) {
-                        current_object->m_value = std::stod(value);
+                        current_object->m_value = std::stoll(value);
                         json_objects_stack.pop();
                     } else {
                         current_object->addElement(std::make_shared< tristan::json::JsonElement >(static_cast< int64_t >(std::stoll(value))));
