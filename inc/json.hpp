@@ -67,35 +67,35 @@ namespace tristan::json {
         /**
          * \overload
          * \brief Creates object which holds key as std::nullopt and thus may be used in array
-         * \param value
+         * \param p_value
          */
-        explicit JsonElement(double value);
+        explicit JsonElement(double p_value);
         /**
          * \overload
          * \brief Constructor
-         * \param key std::string
-         * \param value int64_t
+         * \param p_key std::string
+         * \param p_value int64_t
          */
-        JsonElement(std::string key, int64_t value);
+        JsonElement(std::string p_key, int64_t p_value);
         /**
          * \overload
          * \brief Creates object which holds key as std::nullopt and thus may be used in array
-         * \param value
+         * \param p_value
          */
-        explicit JsonElement(int64_t value);
+        explicit JsonElement(int64_t p_value);
         /**
          * \overload
          * \brief Constructor
-         * \param key std::string
-         * \param value bool
+         * \param p_key std::string
+         * \param p_value bool
          */
-        JsonElement(std::string key, bool value);
+        JsonElement(std::string p_key, bool p_value);
         /**
          * \overload
          * \brief Creates object which holds key as std::nullopt and thus may be used in array
-         * \param value
+         * \param p_value
          */
-        explicit JsonElement(bool value);
+        explicit JsonElement(bool p_value);
         /**
          * \brief Deleted copy constructor
          */
@@ -118,30 +118,30 @@ namespace tristan::json {
          */
         ~JsonElement() = default;
         /**
-         * \brief Adds element as a child
-         * \param element JsonElement&&
+         * \brief Adds p_json_element as a child
+         * \param p_json_element JsonElement&&
          */
-        void addElement(std::shared_ptr< JsonElement > element);
+        void addElement(std::shared_ptr< JsonElement > p_json_element);
         /**
-         * \brief Sets value
-         * \param value std::string
+         * \brief Sets p_value
+         * \param p_value std::string
          */
-        void setValue(std::string value);
+        void setValue(std::string p_value);
         /**
-         * \brief Sets value
-         * \param value double
+         * \brief Sets p_value
+         * \param p_value double
          */
-        void setValue(double value);
+        void setValue(double p_value);
         /**
-         * \brief Sets value
-         * \param value int64_t
+         * \brief Sets p_value
+         * \param p_value int64_t
          */
-        void setValue(int64_t value);
+        void setValue(int64_t p_value);
         /**
-         * \brief Sets value
-         * \param value bool
+         * \brief Sets p_value
+         * \param p_value bool
          */
-        void setValue(bool value);
+        void setValue(bool p_value);
 
         /**
          * \brief Return key if JsonElement was instantiated as key:value pair or std::nullopt otherwise
@@ -229,11 +229,11 @@ namespace tristan::json {
         /**
          * \brief Searches through the children.
          * Search is made not recursively
-         * \param name const std::string&
+         * \param p_name const std::string&
          * \return std::shared_ptr< JsonElement > which is empty if child was not found
          * \throws std::bad_variant_access if value is this is not an object
          */
-        [[nodiscard]] auto getChildByName(const std::string& name) -> std::shared_ptr<JsonElement>;
+        [[nodiscard]] auto getChildByName(const std::string& p_name) -> std::shared_ptr<JsonElement>;
     protected:
 
     private:
@@ -255,8 +255,8 @@ namespace tristan::json {
 
     class JsonDoc {
 
-        friend auto operator<<(std::ostream& output, const JsonDoc& json_doc) -> std::ostream&;
-        friend auto operator<<(std::stringstream& output, const JsonDoc& json_doc) -> std::stringstream&;
+        friend auto operator<<(std::ostream& p_output, const JsonDoc& p_json_doc) -> std::ostream&;
+        friend auto operator<<(std::stringstream& p_output, const JsonDoc& p_json_doc) -> std::stringstream&;
 
         /**
          * \private
@@ -271,11 +271,11 @@ namespace tristan::json {
          * \overload
          * \brief Parses json data and returns parsed JsonDoc.
          * Checks during parsing the validity of json data and sets JsonError accordingly
-         * It is a good practice to check if JsonError::place is equal std::string:npos which means json does not contain any errors
-         * \param json_document const std::string&
+         * It is a good practice to check if JsonDoc::error() after using this method
+         * \param p_json_document const std::string&
          * \return std::shared_ptr<JsonDoc>
          */
-        static auto createJsonDocument(const std::string& json_document) -> std::shared_ptr< JsonDoc >;
+        static auto createJsonDocument(const std::string& p_json_document) -> std::shared_ptr< JsonDoc >;
         /**
          * \brief Deleted copy constructor
          */
@@ -304,26 +304,26 @@ namespace tristan::json {
 
         /**
          * \brief Adds child to json document
-         * \param element std::shared_ptr< JsonElement >
+         * \param p_json_element std::shared_ptr< JsonElement >
          * \throws std::invalid_argument if document is not an array and child key is not set
          */
-        void addChild(std::shared_ptr< JsonElement > element);
+        void addChild(std::shared_ptr< JsonElement > p_json_element);
 
         /**
          * \brief Sets if beauty output should be provided by operator << and docToString()
-         * \param value bool. Default is true
+         * \param p_value bool. Default is true
          */
-        void beautifyOutput(bool value = true) noexcept;
+        void beautifyOutput(bool p_value = true) noexcept;
 
         /**
          * \brief Searches through the children.
          * If search is not recursive and JsonDoc is set to be an array, then search will always return empty object as json arrays can not contain key:value pairs
-         * \param name const std::string&
-         * \param recursively bool. Default value is false
+         * \param p_name const std::string&
+         * \param p_recursively bool. Default value is false
          * \return std::shared_ptr< JsonElement > which is empty if child was not found
          * \note Recursive search should be used with caution as in case of multiple elements only the first one will be returned.
          */
-        [[nodiscard]] auto getChildByName(const std::string& name, bool recursively = false) const -> std::shared_ptr< JsonElement >;
+        [[nodiscard]] auto getChildByName(const std::string& p_name, bool p_recursively = false) const -> std::shared_ptr< JsonElement >;
 
         /**
          * \brief Provides printable json document
@@ -339,18 +339,18 @@ namespace tristan::json {
 
         /**
          * \brief Encodes the string value according to JSON standard, aka adds escape character
-         * \param string_value
+         * \param p_string
          * \return std::string
          */
-        [[nodiscard]] static auto encodeStringValue(std::string string_value) -> std::string;
+        [[nodiscard]] static auto encodeStringValue(std::string p_string) -> std::string;
 
         /**
          * \brief Beatifies the resulting json doc. This function is invoked is beatifyOutput is set to true.
-         * \param json_doc const std::string&
-         * \param indent uint8_t. Number of spaces to use as indent
+         * \param p_json_doc const std::string&
+         * \param p_indent uint8_t. Number of spaces to use as p_indent
          * \return td::string
          */
-        [[nodiscard]] static auto beautifyOutput(const std::string& json_doc, uint8_t indent = 2) -> std::string;
+        [[nodiscard]] static auto beautifyOutput(const std::string& p_json_doc, uint8_t p_indent = 2) -> std::string;
 
     protected:
     private:
@@ -363,8 +363,8 @@ namespace tristan::json {
         bool m_beautify_output;
     };
 
-    auto operator<<(std::ostream& output, const JsonDoc& json_doc) -> std::ostream&;
-    auto operator<<(std::stringstream& output, const JsonDoc& json_doc) -> std::stringstream&;
+    auto operator<<(std::ostream& p_output, const JsonDoc& p_json_doc) -> std::ostream&;
+    auto operator<<(std::stringstream& p_output, const JsonDoc& p_json_doc) -> std::stringstream&;
 
 }  // namespace tristan::json
 
