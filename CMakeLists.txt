@@ -55,7 +55,7 @@ file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS
         src/*.cpp
         )
 
-set(LIB_VERSION 1.0.0)
+set(LIB_VERSION 1.0.4)
 
 
 if ("${CMAKE_INSTALL_PREFIX}" STREQUAL "")
