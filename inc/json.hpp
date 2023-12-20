@@ -30,7 +30,7 @@ namespace tristan::json {
         /**
          * \brief  Default constructor
          */
-        JsonElement();
+        JsonElement() = default;
 
         /**
          * \overload
@@ -239,10 +239,10 @@ namespace tristan::json {
     private:
         [[nodiscard]] auto print() -> std::string;
 
-        std::optional<std::string> m_key;
-        std::variant< std::monostate, std::string, Children, double, int64_t, bool > m_value;
-        bool m_object;
-        bool m_array;
+        std::optional<std::string> m_key{std::nullopt};
+        std::variant< std::monostate, std::string, Children, double, int64_t, bool > m_value{std::monostate()};
+        bool m_object{false};
+        bool m_array{false};
     };
 
     struct JsonError {
@@ -262,7 +262,7 @@ namespace tristan::json {
          * \private
          * \brief Default constructor
          */
-        JsonDoc();
+        JsonDoc() = default;
     public:
 
         auto static createJsonDocument() -> std::shared_ptr<JsonDoc>;
@@ -358,9 +358,9 @@ namespace tristan::json {
 
         std::vector< std::shared_ptr< JsonElement > > m_children;
 
-        bool m_object;
-        bool m_array;
-        bool m_beautify_output;
+        bool m_object{false};
+        bool m_array{false};
+        bool m_beautify_output{false};
     };
 
     auto operator<<(std::ostream& p_output, const JsonDoc& p_json_doc) -> std::ostream&;

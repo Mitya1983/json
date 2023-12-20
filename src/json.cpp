@@ -5,22 +5,10 @@
 #include <utility>
 #include <queue>
 
-tristan::json::JsonElement::JsonElement() :
-    m_key(std::nullopt),
-    m_value(std::monostate()),
-    m_object(false),
-    m_array(false) { }
-
-tristan::json::JsonElement::JsonElement(std::string string, ArgumentType argument_type) :
-    m_key(std::nullopt),
-    m_value(std::monostate()),
-    m_object(false),
-    m_array(false) {
+tristan::json::JsonElement::JsonElement(std::string string, ArgumentType argument_type) {
     if (argument_type == ArgumentType::KEY) {
         m_key = std::move(string);
-        m_value = std::monostate();
     } else {
-        m_key = std::nullopt;
         m_value = std::move(string);
     }
 }
@@ -29,50 +17,33 @@ tristan::json::JsonElement::JsonElement(const char* string, tristan::json::Argum
     tristan::json::JsonElement(std::string(string), argument_type) { }
 
 tristan::json::JsonElement::JsonElement(std::string key, std::string value) :
-    m_key(std::move(key)),
-    m_value(std::move(value)),
-    m_object(false),
-    m_array(false) { }
+    m_key{std::move(key)},
+    m_value{std::move(value)} { }
 
 tristan::json::JsonElement::JsonElement(std::string p_key, double p_value) :
-    m_key(std::move(p_key)),
-    m_value(p_value),
-    m_object(false),
-    m_array(false) { }
+    m_key{std::move(p_key)},
+    m_value{p_value} { }
 
 tristan::json::JsonElement::JsonElement(double p_value) :
-    m_key(std::nullopt),
-    m_value(p_value),
-    m_object(false),
-    m_array(false) { }
+    m_value{p_value} { }
 
 tristan::json::JsonElement::JsonElement(std::string p_key, int64_t p_value) :
-    m_key(std::move(p_key)),
-    m_value(p_value),
-    m_object(false),
-    m_array(false) { }
+    m_key{std::move(p_key)},
+    m_value{p_value} { }
 
 tristan::json::JsonElement::JsonElement(int64_t p_value) :
-    m_key(std::nullopt),
-    m_value(p_value),
-    m_object(false),
-    m_array(false) { }
+    m_value{p_value} { }
 
 tristan::json::JsonElement::JsonElement(std::string p_key, bool p_value) :
-    m_key(std::move(p_key)),
-    m_value(p_value),
-    m_object(false),
-    m_array(false) { }
+    m_key{std::move(p_key)},
+    m_value{p_value} { }
 
 tristan::json::JsonElement::JsonElement(bool p_value) :
-    m_key(std::nullopt),
-    m_value(p_value),
-    m_object(false),
-    m_array(false) { }
+    m_value{p_value} { }
 
 void tristan::json::JsonElement::addElement(std::shared_ptr< JsonElement > p_json_element) {
     if (std::holds_alternative< std::monostate >(m_value)) {
-        m_value = Children();
+        m_value = Children{};
     }
     if (std::holds_alternative< Children >(m_value)) {
         auto& children = std::get< Children >(m_value);
@@ -222,11 +193,6 @@ std::stringstream& tristan::json::operator<<(std::stringstream& p_output, const 
     p_output << p_json_doc.toString();
     return p_output;
 }
-
-tristan::json::JsonDoc::JsonDoc() :
-    m_object(false),
-    m_array(false),
-    m_beautify_output(false) { }
 
 auto tristan::json::JsonDoc::createJsonDocument() -> std::shared_ptr< JsonDoc > { return std::shared_ptr< JsonDoc >(new JsonDoc()); }
 
