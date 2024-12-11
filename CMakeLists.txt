@@ -72,6 +72,14 @@ message(STATUS "${PROJECT_NAME}: Library install directory is set to ${LIBRARY_I
 set(INCLUDE_INSTALL_DIR ${LIBRARY_INSTALL_DIR}/include)
 message(STATUS "${PROJECT_NAME}: Include install directory is set to ${INCLUDE_INSTALL_DIR}")
 
+if (NOT ${PROJECT_IS_TOP_LEVEL})
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+        add_compile_definitions(-DMT_DEBUG)
+    endif ()
+    set(JSON_LIBRARY_DIR ${LIBRARY_INSTALL_DIR} PARENT_SCOPE)
+    set(JSON_INCLUDE_DIR ${INCLUDE_INSTALL_DIR} PARENT_SCOPE)
+endif ()
+
 if (${BUILD_STATIC})
     message(STATUS "${PROJECT_NAME}: Will build static library")
     add_library(${PROJECT_NAME} STATIC)
@@ -80,13 +88,6 @@ else ()
     add_library(${PROJECT_NAME} SHARED)
 endif ()
 
-if (NOT ${PROJECT_IS_TOP_LEVEL})
-    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-        target_compile_definitions(${PROJECT_NAME} PUBLIC MT_DEBUG)
-    endif ()
-    set(JSON_LIBRARY_DIR ${LIBRARY_INSTALL_DIR} PARENT_SCOPE)
-    set(JSON_INCLUDE_DIR ${INCLUDE_INSTALL_DIR} PARENT_SCOPE)
-endif ()
 
 if (${ENABLE_ASAN} AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_BUILD_TYPE STREQUAL "Debug")
     string(REPLACE "." ";" CLANG_VERSION ${CMAKE_CXX_COMPILER_VERSION})
@@ -118,7 +119,7 @@ set_target_properties(
         VERSION ${LIB_VERSION}
         OUTPUT_NAME ${PROJECT_NAME}
 )
-if (${DOCS})
+if (${BUILD_DOCS})
     find_package(Doxygen REQUIRED doxygen)
     set(DOXYGEN_OUTPUT_DIRECTORY ${PROJECT_INSTALL_DIR}/Docs)
     set(DOXYGEN_GENERATE_HTML YES)
