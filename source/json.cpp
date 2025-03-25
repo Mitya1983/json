@@ -36,7 +36,7 @@ mt::json::JsonValue::JsonValue(bool p_value) :
     m_value(p_value) {
 }
 
-auto mt::json::JsonValue::fromString(const std::string& p_data, uint64_t& pos) -> JsonValue {
+auto mt::json::JsonValue::fromString(const std::string_view p_data, uint64_t& pos) -> JsonValue {
     if (p_data[ pos ] == '"') {
         ++pos;
         std::string value;
@@ -277,6 +277,10 @@ mt::json::Json::Json(std::string p_key, std::shared_ptr< Json > p_value) :
 }
 
 auto mt::json::Json::fromString(const std::string& p_json_data) -> Json {
+    return Json::fromString(std::string_view(p_json_data));
+}
+
+auto mt::json::Json::fromString(std::string_view p_json_data) -> Json {
     uint64_t position{0};
     return Json::fromString(p_json_data, position);
 }
@@ -470,7 +474,7 @@ auto mt::json::Json::toString(const bool p_beautify, const uint8_t level, bool i
     return result;
 }
 
-auto mt::json::Json::fromString(const std::string& p_data, uint64_t& pos) -> Json {  //NOLINT
+auto mt::json::Json::fromString(const std::string_view p_data, uint64_t& pos) -> Json {  //NOLINT
     if (p_data[ pos ] == '}') {
         Json element;
         element.m_object = true;

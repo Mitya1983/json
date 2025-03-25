@@ -50,7 +50,7 @@ namespace mt::json {
         ~JsonValue() = default;
 
       private:
-        [[nodiscard]] static auto fromString(const std::string& p_data, uint64_t& pos) -> JsonValue;
+        [[nodiscard]] static auto fromString(std::string_view p_data, uint64_t& pos) -> JsonValue;
         std::variant< std::monostate, std::string, const char *, double, int64_t, bool> m_value{std::monostate()};
     };
 
@@ -65,6 +65,7 @@ namespace mt::json {
         explicit Json(std::string p_key, std::shared_ptr<Json> p_value);
 
         [[nodiscard]] static auto fromString(const std::string& p_json_data) -> Json;
+        [[nodiscard]] static auto fromString(std::string_view p_json_data) -> Json;
 
         Json(const Json&) = delete;
         Json(Json&&) = default;
@@ -91,7 +92,7 @@ namespace mt::json {
 
       private:
 
-        [[nodiscard]] static auto fromString(const std::string& p_data, uint64_t& pos) -> Json;
+        [[nodiscard]] static auto fromString(std::string_view p_data, uint64_t& pos) -> Json;
 
         std::variant< std::monostate, JsonValue, std::shared_ptr<Json>, std::vector< std::shared_ptr< Json > > > m_value{std::monostate()};
         std::string m_key;
